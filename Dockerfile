@@ -4,7 +4,13 @@
 FROM quay.io/fedora/fedora:40-x86_64
 LABEL description="Mintmaker - Renovate custom image" \
       summary="Mintmaker basic container image - a Renovate custom image" \
-      maintainer="EXD Rebuilds Guild <exd-guild-rebuilds@redhat.com >"
+      maintainer="EXD Rebuilds Guild <exd-guild-rebuilds@redhat.com >" \
+      io.k8s.description="Mintmaker - Renovate custom image" \
+      com.redhat.component="mintmaker-renovate-image" \
+      distribution-scope="public" \
+      release="0.0.1" \
+      url="https://github.com/konflux-ci/mintmaker-renovate-image/" \
+      vendor="Red Hat, Inc."
 
 ARG RENOVATE_VERSION=37.407.1-custom
 
