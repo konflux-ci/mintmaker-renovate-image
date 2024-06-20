@@ -12,7 +12,7 @@ LABEL description="Mintmaker - Renovate custom image" \
       url="https://github.com/konflux-ci/mintmaker-renovate-image/" \
       vendor="Red Hat, Inc."
 
-ARG RENOVATE_VERSION=37.407.1-custom
+ARG RENOVATE_VERSION=37.413.2-custom
 
 # Using OpenSSL store allows for external modifications of the store. It is needed for the internal Red Hat cert.
 ENV NODE_OPTIONS=--use-openssl-ca
@@ -74,7 +74,7 @@ WORKDIR /home/renovate/rpm-lockfile-prototype
 # Clone and install the rpm-lockfile-prototype
 # We must pass --no-dependencies, otherwise it would try to
 # fetch dnf from PyPI, which is just a dummy package
-RUN git clone --depth=1 --branch v0.1.0-alpha.5 https://github.com/konflux-ci/rpm-lockfile-prototype.git .
+RUN git clone --depth=1 --branch v0.1.0-alpha.7 https://github.com/konflux-ci/rpm-lockfile-prototype.git .
 RUN pip3 install --user jsonschema PyYaml productmd requests
 RUN pip3 install --user --no-dependencies .
 
