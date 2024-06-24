@@ -78,4 +78,5 @@ RUN git clone --depth=1 --branch v0.1.0-alpha.7 https://github.com/konflux-ci/rp
 RUN pip3 install --user jsonschema PyYaml productmd requests
 RUN pip3 install --user --no-dependencies .
 
+RUN chmod -R 755 /home/renovate
 WORKDIR /workspace
