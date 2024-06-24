@@ -318,6 +318,13 @@ spec:
         - name: kind
           value: task
         resolver: bundles
+      resources:
+        limits:
+          cpu: "2"
+          memory: 4Gi
+        requests:
+          cpu: 3m
+          memory: 1Gi
       when:
       - input: $(params.skip-checks)
         operator: in
