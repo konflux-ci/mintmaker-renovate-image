@@ -36,6 +36,7 @@ RUN dnf update -y && \
 
 # Add renovate user and switch to it
 RUN useradd -lms /bin/bash -u 1001 renovate
+RUN chmod -R 755 /home/renovate
 
 WORKDIR /home/renovate
 USER 1001
