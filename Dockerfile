@@ -46,11 +46,11 @@ USER 1001
 ENV PATH="/home/renovate/.local/bin:/home/renovate/node_modules/.bin:${PATH}"
 
 # Install package managers
-RUN npm install pnpm@9.2.0
+RUN npm install pnpm@9.2.0 && npm cache clean --force
 
 # Use virtualenv isolation to avoid dependency issues with other global packages
-RUN pip3 install --user pipx
-RUN pipx install poetry pdm pipenv
+RUN pip3 install --user pipx && pip3 cache purge
+RUN pipx install poetry pdm pipenv && rm -fr ~/.cache/pipx && pip3 cache purge
 
 WORKDIR /home/renovate/renovate
 
@@ -60,14 +60,8 @@ RUN git clone --depth=1 --branch rpm-lockfiles https://github.com/redhat-exd-reb
 # Replace package.json version for this build
 RUN sed -i "s/0.0.0-semantic-release/${RENOVATE_VERSION}/g" package.json
 
-# Install project dependencies
-RUN pnpm install
-
-# Build Renovate
-RUN pnpm build
-
-# Install executables into the bin dir
-RUN npm install --prefix /home/renovate .
+# Install project dependencies, build and install Renovate
+RUN pnpm install && pnpm build && npm install --prefix /home/renovate . && pnpm store prune && npm cache clean --force
 
 WORKDIR /home/renovate/rpm-lockfile-prototype
 
@@ -75,7 +69,6 @@ WORKDIR /home/renovate/rpm-lockfile-prototype
 # We must pass --no-dependencies, otherwise it would try to
 # fetch dnf from PyPI, which is just a dummy package
 RUN git clone --depth=1 --branch v0.1.0-alpha.7 https://github.com/konflux-ci/rpm-lockfile-prototype.git .
-RUN pip3 install --user jsonschema PyYaml productmd requests
-RUN pip3 install --user --no-dependencies .
+RUN pip3 install --user jsonschema PyYaml productmd requests && pip3 install --user --no-dependencies . && pip3 cache purge
 
 WORKDIR /workspace
