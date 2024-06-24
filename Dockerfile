@@ -70,6 +70,8 @@ WORKDIR /home/renovate/rpm-lockfile-prototype
 # We must pass --no-dependencies, otherwise it would try to
 # fetch dnf from PyPI, which is just a dummy package
 RUN git clone --depth=1 --branch v0.1.0-alpha.7 https://github.com/konflux-ci/rpm-lockfile-prototype.git .
-RUN pip3 install --user jsonschema PyYaml productmd requests && pip3 install --user --no-dependencies . && pip3 cache purge
+USER root
+RUN pip3 install jsonschema PyYaml productmd requests && pip3 install --no-dependencies . && pip3 cache purge
+USER 1001
 
 WORKDIR /workspace
