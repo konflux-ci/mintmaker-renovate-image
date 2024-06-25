@@ -1,7 +1,7 @@
 # Build with: podman build --ulimit nofile=65535:65535 . -t custom-renovate
 # Run with: podman run --rm <additional args> custom-renovate renovate
 
-FROM quay.io/fedora/fedora:40-x86_64
+FROM quay.io/fedora/fedora:41-x86_64
 LABEL description="Mintmaker - Renovate custom image" \
       summary="Mintmaker basic container image - a Renovate custom image" \
       maintainer="EXD Rebuilds Guild <exd-guild-rebuilds@redhat.com >" \
