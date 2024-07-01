@@ -1,7 +1,7 @@
 # Build with: podman build --ulimit nofile=65535:65535 . -t custom-renovate
 # Run with: podman run --rm <additional args> custom-renovate renovate
 
-FROM quay.io/fedora/fedora:40-x86_64
+FROM registry.access.redhat.com/ubi9-minimal
 LABEL description="Mintmaker - Renovate custom image" \
       summary="Mintmaker basic container image - a Renovate custom image" \
       maintainer="EXD Rebuilds Guild <exd-guild-rebuilds@redhat.com >" \
@@ -17,20 +17,20 @@ ARG RENOVATE_VERSION=37.413.2-custom
 # Using OpenSSL store allows for external modifications of the store. It is needed for the internal Red Hat cert.
 ENV NODE_OPTIONS=--use-openssl-ca
 
-RUN dnf update -y && \
-    dnf install -y \
+RUN microdnf update -y && \
+    microdnf module enable -y nodejs:20/common && \
+    microdnf install -y \
         git \
-        python3-dnf \
-        python3-pip \
+        python3.12-pip \
+        python3.12 \
         python3.11 \
-        python3.10 \
-        python3.9 \
-        python3.8 \
+        python3.11-pip \
+        python3-pip \
+        python3-dnf \
         nodejs \
         npm \
-        skopeo \
-        podman && \
-    dnf clean all && \
+        skopeo && \
+    microdnf clean all && \
     rpm --install --verbose \
         https://github.com/tektoncd/cli/releases/download/v0.35.1/tektoncd-cli-0.35.1_Linux-64bit.rpm
 
@@ -50,8 +50,8 @@ ENV PATH="/home/renovate/.local/bin:/home/renovate/node_modules/.bin:${PATH}"
 RUN npm install pnpm@9.2.0 && npm cache clean --force
 
 # Use virtualenv isolation to avoid dependency issues with other global packages
-RUN pip3 install --user pipx && pip3 cache purge
-RUN pipx install poetry pdm pipenv && rm -fr ~/.cache/pipx && pip3 cache purge
+RUN pip3.12 install --user pipx && pip3.12 cache purge
+RUN pipx install --python python3.12 poetry pdm pipenv && rm -fr ~/.cache/pipx && pip3.12 cache purge
 
 WORKDIR /home/renovate/renovate
 
