@@ -16,6 +16,8 @@ metadata:
   name: mintmaker-renovate-image-on-push
   namespace: konflux-mintmaker-tenant
 spec:
+  timeouts:
+    pipeline: "1h30m0s"
   params:
   - name: git-url
     value: '{{source_url}}'
