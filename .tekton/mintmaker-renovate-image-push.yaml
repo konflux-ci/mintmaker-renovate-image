@@ -16,7 +16,7 @@ metadata:
   namespace: konflux-mintmaker-tenant
 spec:
   timeouts:
-    pipeline: "1h30m0s"
+    pipeline: "2h30m"
   params:
   - name: git-url
     value: '{{source_url}}'
@@ -226,6 +226,7 @@ spec:
         value: $(params.build-args-file)
       runAfter:
       - prefetch-dependencies
+      timeout: "2h"
       taskRef:
         params:
         - name: name
