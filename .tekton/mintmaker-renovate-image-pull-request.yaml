@@ -17,7 +17,7 @@ metadata:
   namespace: konflux-mintmaker-tenant
 spec:
   timeouts:
-    pipeline: "1h30m0s"
+    pipeline: "2h"
   params:
   - name: git-url
     value: '{{source_url}}'
@@ -229,6 +229,7 @@ spec:
         value: $(params.build-args-file)
       runAfter:
       - prefetch-dependencies
+      timeout: "2h"
       taskRef:
         params:
         - name: name
@@ -287,6 +288,28 @@ spec:
           value: deprecated-image-check
         - name: bundle
           value: quay.io/konflux-ci/tekton-catalog/task-deprecated-image-check:0.4@sha256:ea275aeb7d204ef203a67e6a45a4902479afc1d906d2120f0d8c77d9541ea850
+        - name: kind
+          value: task
+        resolver: bundles
+      when:
+      - input: $(params.skip-checks)
+        operator: in
+        values:
+        - "false"
+    - name: clair-scan
+      params:
+      - name: image-digest
+        value: $(tasks.build-container.results.IMAGE_DIGEST)
+      - name: image-url
+        value: $(tasks.build-container.results.IMAGE_URL)
+      runAfter:
+      - build-container
+      taskRef:
+        params:
+        - name: name
+          value: clair-scan
+        - name: bundle
+          value: quay.io/konflux-ci/tekton-catalog/task-clair-scan:0.1@sha256:eed371ce8d1473e31a0befaa60134dedce47debe9527df0932f7fdea6a0c73b9
         - name: kind
           value: task
         resolver: bundles
