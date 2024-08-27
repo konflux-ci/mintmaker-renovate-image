@@ -12,13 +12,16 @@ LABEL description="Mintmaker - Renovate custom image" \
       url="https://github.com/konflux-ci/mintmaker-renovate-image/" \
       vendor="Red Hat, Inc."
 
-ARG RENOVATE_VERSION=37.413.2-custom
+ARG RENOVATE_VERSION=38.55.2-rpm
+
+# NodeJS version used for Renovate, has to satisfy the version
+# specified in Renovate's package.json
+ARG NODEJS_VERSION=20.17.0
 
 # Using OpenSSL store allows for external modifications of the store. It is needed for the internal Red Hat cert.
 ENV NODE_OPTIONS=--use-openssl-ca
 
 RUN microdnf update -y && \
-    microdnf module enable -y nodejs:20/common && \
     microdnf install -y \
         git \
         python3.12-pip \
@@ -27,12 +30,23 @@ RUN microdnf update -y && \
         python3.11-pip \
         python3-pip \
         python3-dnf \
-        nodejs \
-        npm \
-        skopeo && \
+        python3.9 \
+        cargo \
+        golang \
+        skopeo \
+        xz && \
     microdnf clean all && \
     rpm --install --verbose \
         https://github.com/tektoncd/cli/releases/download/v0.35.1/tektoncd-cli-0.35.1_Linux-64bit.rpm
+
+# Install nodejs
+RUN curl -o node-v${NODEJS_VERSION}-linux-x64.tar.xz https://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-x64.tar.xz
+RUN tar xf node-v${NODEJS_VERSION}-linux-x64.tar.xz && \
+    mv node-v${NODEJS_VERSION}-linux-x64/bin/* /bin/ && \
+    mv node-v${NODEJS_VERSION}-linux-x64/include/* /include/ && \
+    mv node-v${NODEJS_VERSION}-linux-x64/lib/* /lib/ && \
+    rm -fr node-v${NODEJS_VERSION}-linux-x64 && \
+    rm -f node-v${NODEJS_VERSION}-linux-x64.tar.xz
 
 # Add renovate user and switch to it
 RUN useradd -lms /bin/bash -u 1001 renovate
@@ -44,7 +58,7 @@ USER 1001
 # Enable renovate user's bin dirs,
 #   ~/.local/bin for Python executables
 #   ~/node_modules/.bin for renovate
-ENV PATH="/home/renovate/.local/bin:/home/renovate/node_modules/.bin:${PATH}"
+ENV PATH="/home/renovate/.local/bin:/home/renovate/node_modules/.bin:/home/renovate/go/bin:/tmp/renovate/cache/others/go/bin:${PATH}"
 
 # Install package managers
 RUN npm install pnpm@9.2.0 && npm cache clean --force
