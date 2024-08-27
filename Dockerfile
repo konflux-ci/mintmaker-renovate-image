@@ -21,6 +21,7 @@ RUN microdnf update -y && \
     microdnf module enable -y nodejs:20/common && \
     microdnf install -y \
         git \
+        openssl \
         python3.12-pip \
         python3.12 \
         python3.11 \
