@@ -71,7 +71,7 @@ RUN pipx install --python python3.12 poetry pdm pipenv hashin && rm -fr ~/.cache
 WORKDIR /home/renovate/renovate
 
 # Clone Renovate from specific ref (that includes the RPM lockfile support)
-RUN git clone --depth=1 --branch rpm-lockfiles https://github.com/redhat-exd-rebuilds/renovate.git .
+RUN git clone --depth=1 --branch rpm-lockfiles-new https://github.com/redhat-exd-rebuilds/renovate.git .
 
 # Replace package.json version for this build
 RUN sed -i "s/0.0.0-semantic-release/${RENOVATE_VERSION}/g" package.json
