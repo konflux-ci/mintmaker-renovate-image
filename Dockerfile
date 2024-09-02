@@ -24,6 +24,7 @@ ENV NODE_OPTIONS=--use-openssl-ca
 RUN microdnf update -y && \
     microdnf install -y \
         git \
+        openssl \
         python3.12-pip \
         python3.12 \
         python3.11 \
