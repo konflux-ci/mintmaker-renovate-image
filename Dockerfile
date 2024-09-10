@@ -12,7 +12,13 @@ LABEL description="Mintmaker - Renovate custom image" \
       url="https://github.com/konflux-ci/mintmaker-renovate-image/" \
       vendor="Red Hat, Inc."
 
+# The version number is from upstream Renovate, while the `-rpm` suffix
+# is to differentiate the rpm lockfile enabled fork
 ARG RENOVATE_VERSION=38.55.2-rpm
+
+# Version for the rpm-lockfile-prototype executable from
+# https://github.com/konflux-ci/rpm-lockfile-prototype/tags
+ARG RPM_LOCKFILE_PROTOTYPE_VERSION=0.8.1
 
 # NodeJS version used for Renovate, has to satisfy the version
 # specified in Renovate's package.json
@@ -84,7 +90,7 @@ WORKDIR /home/renovate/rpm-lockfile-prototype
 # Clone and install the rpm-lockfile-prototype
 # We must pass --no-dependencies, otherwise it would try to
 # fetch dnf from PyPI, which is just a dummy package
-RUN git clone --depth=1 --branch v0.7.0 https://github.com/konflux-ci/rpm-lockfile-prototype.git .
+RUN git clone --depth=1 --branch v${RPM_LOCKFILE_PROTOTYPE_VERSION} https://github.com/konflux-ci/rpm-lockfile-prototype.git .
 USER root
 RUN pip3 install jsonschema PyYaml productmd requests && pip3 install --no-dependencies . && pip3 cache purge
 USER 1001
