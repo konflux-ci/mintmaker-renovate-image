@@ -42,9 +42,9 @@ RUN microdnf update -y && \
         golang \
         skopeo \
         xz && \
-    microdnf clean all && \
-    rpm --install --verbose \
-        https://github.com/tektoncd/cli/releases/download/v0.35.1/tektoncd-cli-0.35.1_Linux-64bit.rpm
+    microdnf clean all
+
+RUN curl -L -o /tmp/tkn.tar.gz https://github.com/tektoncd/cli/releases/download/v0.38.1/tkn_0.38.1_Linux_x86_64.tar.gz && tar xvzf /tmp/tkn.tar.gz -C /usr/bin/ tkn && rm -f /tmp/tkn.tar.gz
 
 # Install nodejs
 RUN curl -o node-v${NODEJS_VERSION}-linux-x64.tar.xz https://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-x64.tar.xz
