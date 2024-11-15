@@ -13,6 +13,7 @@ LABEL description="Mintmaker - Renovate custom image" \
       vendor="Red Hat, Inc."
 
 ARG RENOVATE_VERSION=37.413.2-custom
+ENV GOTOOLCHAIN=auto
 
 # Using OpenSSL store allows for external modifications of the store. It is needed for the internal Red Hat cert.
 ENV NODE_OPTIONS=--use-openssl-ca
