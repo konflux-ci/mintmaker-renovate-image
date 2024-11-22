@@ -56,8 +56,9 @@ RUN tar xf node-v${NODEJS_VERSION}-linux-x64.tar.xz && \
     rm -f node-v${NODEJS_VERSION}-linux-x64.tar.xz
 
 # Add renovate user and switch to it
-RUN useradd -lms /bin/bash -u 1001 renovate
-RUN chmod -R 755 /home/renovate
+RUN useradd -lms /bin/bash -u 1001 -g 0 renovate
+RUN chmod -R 6775 /home/renovate && chown :0 /home/renovate
+RUN mkdir -p /home/renovate/.cache && chown :0 /home/renovate/.cache && chmod 6775 /home/renovate/.cache
 
 WORKDIR /home/renovate
 USER 1001
