@@ -14,7 +14,7 @@ LABEL description="Mintmaker - Renovate custom image" \
 
 # The version number is from upstream Renovate, while the `-rpm` suffix
 # is to differentiate the rpm lockfile enabled fork
-ARG RENOVATE_VERSION=38.55.2-rpm
+ARG RENOVATE_VERSION=38.132.0-rpm
 
 # Version for the rpm-lockfile-prototype executable from
 # https://github.com/konflux-ci/rpm-lockfile-prototype/tags
