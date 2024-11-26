@@ -27,6 +27,8 @@ ARG NODEJS_VERSION=20.17.0
 # Using OpenSSL store allows for external modifications of the store. It is needed for the internal Red Hat cert.
 ENV NODE_OPTIONS=--use-openssl-ca
 
+ENV LANG=C.UTF-8
+
 RUN microdnf update -y && \
     microdnf install -y \
         git \
@@ -41,7 +43,17 @@ RUN microdnf update -y && \
         cargo \
         golang \
         skopeo \
-        xz && \
+        xz \
+        xz-devel \
+        findutils \
+        zlib-devel \
+        bzip2 \
+        bzip2-devel \
+        ncurses-devel \
+        libffi-devel \
+        readline \
+        sqlite \
+        sqlite-devel && \
     microdnf clean all
 
 RUN curl -L -o /tmp/tkn.tar.gz https://github.com/tektoncd/cli/releases/download/v0.38.1/tkn_0.38.1_Linux_x86_64.tar.gz && tar xvzf /tmp/tkn.tar.gz -C /usr/bin/ tkn && rm -f /tmp/tkn.tar.gz
@@ -66,7 +78,7 @@ USER 1001
 # Enable renovate user's bin dirs,
 #   ~/.local/bin for Python executables
 #   ~/node_modules/.bin for renovate
-ENV PATH="/home/renovate/.local/bin:/home/renovate/node_modules/.bin:/home/renovate/go/bin:/tmp/renovate/cache/others/go/bin:${PATH}"
+ENV PATH="/home/renovate/.local/bin:/home/renovate/node_modules/.bin:/home/renovate/go/bin:/home/renovate/.pyenv/bin:/tmp/renovate/cache/others/go/bin:${PATH}"
 
 # Install package managers
 RUN npm install pnpm@9.2.0 && npm cache clean --force
@@ -74,6 +86,12 @@ RUN npm install pnpm@9.2.0 && npm cache clean --force
 # Use virtualenv isolation to avoid dependency issues with other global packages
 RUN pip3.12 install --user pipx && pip3.12 cache purge
 RUN pipx install --python python3.12 poetry pdm pipenv hashin uv hatch pip-tools && rm -fr ~/.cache/pipx && pip3.12 cache purge
+
+# Install pyenv
+RUN curl https://pyenv.run | sh
+RUN echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile && \
+    echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile && \
+    echo 'eval "$(pyenv init -)"' >> ~/.profile
 
 WORKDIR /home/renovate/renovate
 
