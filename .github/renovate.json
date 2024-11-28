@@ -7,5 +7,19 @@
     "automergeSchedule": [
       "after 12am and before 12pm on sunday"
     ]
-  }
+  },
+  "customManagers": [
+    {
+        "fileMatch": [
+            "^Dockerfile$"
+        ],
+        "customType": "regex",
+        "datasourceTemplate": "github-tags",
+        "depNameTemplate": "konflux-ci/rpm-lockfile-prototype",
+        "matchStrings": [
+            "ARG RPM_LOCKFILE_PROTOTYPE_VERSION=(?<currentValue>[\\d\\.]+)"
+        ],
+        "versioningTemplate": "semver"
+    }
+  ]
 }
