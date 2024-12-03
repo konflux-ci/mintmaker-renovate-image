@@ -12,9 +12,9 @@ LABEL description="Mintmaker - Renovate custom image" \
       url="https://github.com/konflux-ci/mintmaker-renovate-image/" \
       vendor="Red Hat, Inc."
 
-# The version number is from upstream Renovate, while the `-rpm` suffix
-# is to differentiate the rpm lockfile enabled fork
-ARG RENOVATE_VERSION=38.132.0-rpm
+# The version number is from upstream Renovate
+# A `-rpm` suffix will be added to differentiate the rpm lockfile enabled fork
+ARG RENOVATE_VERSION=38.132.0
 
 # Version for the rpm-lockfile-prototype executable from
 # https://github.com/konflux-ci/rpm-lockfile-prototype/tags
@@ -96,10 +96,14 @@ RUN echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile && \
 WORKDIR /home/renovate/renovate
 
 # Clone Renovate from specific ref (that includes the RPM lockfile support)
-RUN git clone --depth=1 --branch rpm-lockfiles-new https://github.com/redhat-exd-rebuilds/renovate.git .
+RUN git clone --depth=1 --branch ${RENOVATE_VERSION} https://github.com/renovatebot/renovate.git .
+
+# Apply patches
+COPY patches patches
+RUN for p in $(ls patches); do git apply --ignore-whitespace patches/$p; done;
 
 # Replace package.json version for this build
-RUN sed -i "s/0.0.0-semantic-release/${RENOVATE_VERSION}/g" package.json
+RUN sed -i "s/0.0.0-semantic-release/${RENOVATE_VERSION}-rpm/g" package.json
 
 # Install project dependencies, build and install Renovate
 RUN pnpm install && pnpm build && npm install --prefix /home/renovate . && pnpm store prune && npm cache clean --force
