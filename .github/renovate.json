@@ -3,10 +3,7 @@
     "enabled": true,
     "automergeType": "pr",
     "automerge": true,
-    "platformAutomerge": true,
-    "automergeSchedule": [
-      "after 12am and before 12pm on sunday"
-    ]
+    "platformAutomerge": true
   },
   "customManagers": [
     {
