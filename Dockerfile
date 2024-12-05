@@ -18,7 +18,7 @@ ARG RENOVATE_VERSION=38.132.0-rpm
 
 # Version for the rpm-lockfile-prototype executable from
 # https://github.com/konflux-ci/rpm-lockfile-prototype/tags
-ARG RPM_LOCKFILE_PROTOTYPE_VERSION=0.13.0
+ARG RPM_LOCKFILE_PROTOTYPE_VERSION=0.13.1
 
 # NodeJS version used for Renovate, has to satisfy the version
 # specified in Renovate's package.json
