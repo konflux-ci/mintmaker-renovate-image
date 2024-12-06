@@ -100,7 +100,7 @@ RUN git clone --depth=1 --branch ${RENOVATE_VERSION} https://github.com/renovate
 
 # Apply patches
 COPY patches patches
-RUN for p in $(ls patches); do git apply --ignore-whitespace patches/$p; done;
+RUN for p in $(ls patches); do echo "Applying patches/$p" && git apply --ignore-whitespace patches/$p; done;
 
 # Replace package.json version for this build
 RUN sed -i "s/0.0.0-semantic-release/${RENOVATE_VERSION}-rpm/g" package.json
