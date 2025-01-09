@@ -85,7 +85,7 @@ RUN npm install pnpm@9.2.0 && npm cache clean --force
 
 # Use virtualenv isolation to avoid dependency issues with other global packages
 RUN pip3.12 install --user pipx && pip3.12 cache purge
-RUN pipx install --python python3.12 poetry pdm pipenv hashin uv hatch pip-tools && rm -fr ~/.cache/pipx && pip3.12 cache purge
+RUN pipx install --python python3.12 poetry pdm pipenv hashin uv hatch && rm -fr ~/.cache/pipx && pip3.12 cache purge
 
 # Install pyenv
 RUN curl https://pyenv.run | sh
