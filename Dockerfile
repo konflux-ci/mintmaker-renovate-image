@@ -29,6 +29,9 @@ ENV NODE_OPTIONS=--use-openssl-ca
 
 ENV LANG=C.UTF-8
 
+# PYENV_ROOT is also set in ~/.profile, but the file isn't always read
+ENV PYENV_ROOT="/home/renovate/.pyenv"
+
 RUN microdnf update -y && \
     microdnf install -y \
         git \
@@ -92,6 +95,13 @@ RUN curl https://pyenv.run | sh
 RUN echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile && \
     echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile && \
     echo 'eval "$(pyenv init -)"' >> ~/.profile
+
+# Install additional Python versions
+RUN $PYENV_ROOT/plugins/python-build/bin/python-build $(pyenv latest -f -k 3.10) $HOME/python3.10
+ENV PATH="${PATH}:/home/renovate/python3.10/bin"
+
+RUN $PYENV_ROOT/plugins/python-build/bin/python-build $(pyenv latest -f -k 3.13) $HOME/python3.13
+ENV PATH="${PATH}:/home/renovate/python3.13/bin"
 
 WORKDIR /home/renovate/renovate
 
