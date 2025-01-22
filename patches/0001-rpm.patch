@@ -1,0 +1,306 @@
+diff --git a/lib/constants/category.ts b/lib/constants/category.ts
+index a92c54656..0699afe1c 100644
+--- a/lib/constants/category.ts
++++ b/lib/constants/category.ts
+@@ -21,6 +21,7 @@ export const Categories = [
+   'perl',
+   'php',
+   'python',
++  'rpm',
+   'ruby',
+   'rust',
+   'swift',
+diff --git a/lib/modules/manager/api.ts b/lib/modules/manager/api.ts
+index 466ce2f0f..ff184bbe7 100644
+--- a/lib/modules/manager/api.ts
++++ b/lib/modules/manager/api.ts
+@@ -77,6 +77,7 @@ import * as pip_requirements from './pip_requirements';
+ import * as pip_setup from './pip_setup';
+ import * as pipenv from './pipenv';
+ import * as poetry from './poetry';
++import * as rpm from './rpm';
+ import * as preCommit from './pre-commit';
+ import * as pub from './pub';
+ import * as puppet from './puppet';
+@@ -182,6 +183,7 @@ api.set('pip_requirements', pip_requirements);
+ api.set('pip_setup', pip_setup);
+ api.set('pipenv', pipenv);
+ api.set('poetry', poetry);
++api.set('rpm', rpm);
+ api.set('pre-commit', preCommit);
+ api.set('pub', pub);
+ api.set('puppet', puppet);
+diff --git a/lib/modules/manager/rpm/artifacts.spec.ts b/lib/modules/manager/rpm/artifacts.spec.ts
+new file mode 100644
+index 000000000..91b28c45e
+--- /dev/null
++++ b/lib/modules/manager/rpm/artifacts.spec.ts
+@@ -0,0 +1,107 @@
++import { join } from 'upath';
++import { mockExecAll } from '../../../../test/exec-util';
++import { fs } from '../../../../test/util';
++import { updateArtifacts } from '.';
++import type { RepoGlobalConfig } from '../../../config/types';
++import { GlobalConfig } from '../../../config/global';
++
++jest.mock('../../../util/fs');
++
++const adminConfig: RepoGlobalConfig = {
++  localDir: join('/tmp/github/some/repo'),
++  cacheDir: join('/tmp/cache'),
++};
++
++describe('modules/manager/rpm/artifacts', () => {
++  describe('updateArtifacts()', () => {
++    beforeEach(() => {
++      GlobalConfig.set(adminConfig);
++    });
++
++    it('returns null if not in lockFileMaintenance', async () => {
++      expect(await updateArtifacts({
++        packageFileName: 'rpms.in.yaml',
++        updatedDeps: [],
++        newPackageFileContent: '',
++        config: {
++          updateType: 'major',
++        }
++      })).toBeNull();
++    });
++
++    it('returns null if the lock file is the same after update', async () => {
++      const execSnapshots = mockExecAll();
++
++      fs.readLocalFile.mockResolvedValue('Current rpms.lock.yaml');
++
++      expect(await updateArtifacts({
++        packageFileName: 'rpms.in.yaml',
++        updatedDeps: [],
++        newPackageFileContent: '',
++        config: {
++          updateType: 'lockFileMaintenance',
++        }
++      })).toBeNull();
++
++      expect(execSnapshots).toMatchObject([
++        { cmd: 'rpm-lockfile-prototype rpms.in.yaml' },
++      ]);
++    });
++
++    it('returns updated rpms.lock.yaml', async () => {
++      const execSnapshots = mockExecAll();
++
++      fs.readLocalFile.mockResolvedValueOnce('Current rpms.lock.yaml');
++      fs.readLocalFile.mockResolvedValueOnce('New rpms.lock.yaml');
++
++      expect(await updateArtifacts({
++        packageFileName: 'rpms.in.yaml',
++        updatedDeps: [],
++        newPackageFileContent: '',
++        config: {
++          updateType: 'lockFileMaintenance',
++        }
++      })).toEqual([
++        {
++          file: {
++            type: 'addition',
++            path: 'rpms.lock.yaml',
++            contents: 'New rpms.lock.yaml',
++          }
++        }
++      ]);
++
++      expect(execSnapshots).toMatchObject([
++        { cmd: 'rpm-lockfile-prototype rpms.in.yaml' },
++      ]);
++    });
++
++    it('returns updated rpms.lock.yaml for Containerfile', async () => {
++      const execSnapshots = mockExecAll();
++
++      fs.readLocalFile.mockResolvedValueOnce('Current rpms.lock.yaml');
++      fs.readLocalFile.mockResolvedValueOnce('New rpms.lock.yaml');
++
++      expect(await updateArtifacts({
++        packageFileName: 'rpms.in.yaml',
++        updatedDeps: [],
++        newPackageFileContent: '',
++        config: {
++          updateType: 'lockFileMaintenance',
++        }
++      })).toEqual([
++        {
++          file: {
++            type: 'addition',
++            path: 'rpms.lock.yaml',
++            contents: 'New rpms.lock.yaml',
++          }
++        }
++      ]);
++
++      expect(execSnapshots).toMatchObject([
++        { cmd: 'rpm-lockfile-prototype rpms.in.yaml' },
++      ]);
++    });
++  });
++});
+diff --git a/lib/modules/manager/rpm/artifacts.ts b/lib/modules/manager/rpm/artifacts.ts
+new file mode 100644
+index 000000000..88268ab78
+--- /dev/null
++++ b/lib/modules/manager/rpm/artifacts.ts
+@@ -0,0 +1,76 @@
++import type { UpdateArtifact, UpdateArtifactsResult } from "../types";
++import { logger } from "../../../logger";
++import { deleteLocalFile, readLocalFile } from "../../../util/fs";
++import { exec } from '../../../util/exec';
++import type { ExecOptions } from '../../../util/exec/types';
++import { TEMPORARY_ERROR } from '../../../constants/error-messages';
++
++export async function updateArtifacts({
++  packageFileName,
++  updatedDeps,
++  newPackageFileContent,
++  config,
++}: UpdateArtifact): Promise<UpdateArtifactsResult[] | null> {
++  logger.debug(`rpm.updateArtifacts(${packageFileName})`);
++  const isLockFileMaintenance = config.updateType === 'lockFileMaintenance';
++
++  if (!isLockFileMaintenance) {
++    logger.debug('Must be in lockFileMaintenance for rpm manager');
++    return null;
++  }
++
++  let extension = packageFileName.split('.').pop();
++  let lockFileName = `rpms.lock.${extension}`;
++
++  logger.debug(`RPM lock file: ${lockFileName}`);
++
++  const existingLockFileContent = await readLocalFile(lockFileName, 'utf8');
++
++  logger.debug(`Updating ${lockFileName}`);
++
++  const cmd: string[] = [];
++
++  try {
++    await deleteLocalFile(lockFileName);
++
++    cmd.push(`rpm-lockfile-prototype ${packageFileName}`);
++
++    const execOptions: ExecOptions = {
++      cwdFile: packageFileName,
++    }
++
++    await exec(cmd, execOptions);
++
++    const newLockFileContent = await readLocalFile(lockFileName, 'utf8');
++
++    if (existingLockFileContent === newLockFileContent) {
++      logger.debug(`${lockFileName} is unchanged`);
++      return null;
++    }
++
++    logger.debug(`Returning updated ${lockFileName}`);
++
++    return [
++      {
++        file: {
++          type: 'addition',
++          path: lockFileName,
++          contents: newLockFileContent,
++        }
++      }
++    ];
++  } catch (err) {
++    if (err.message === TEMPORARY_ERROR) {
++      throw err;
++    }
++    logger.debug({ err }, `Failed to update ${lockFileName} file`);
++    return [
++      {
++        artifactError: {
++          lockFile: lockFileName,
++          stderr: `${String(err.stdout)}\n${String(err.stderr)}`,
++        },
++      },
++    ];
++  }
++}
+diff --git a/lib/modules/manager/rpm/extract.spec.ts b/lib/modules/manager/rpm/extract.spec.ts
+new file mode 100644
+index 000000000..b8a72e6b9
+--- /dev/null
++++ b/lib/modules/manager/rpm/extract.spec.ts
+@@ -0,0 +1,19 @@
++import { extractPackageFile } from '.';
++
++describe('modules/manager/rpm/extract', () => {
++  describe('extractPackageFile()', () => {
++    it('always returns empty yaml', async () => {
++      expect(await extractPackageFile('', 'rpms.in.yaml')).toEqual({
++        deps: [],
++        lockFiles: ['rpms.lock.yaml'],
++      })
++    });
++
++    it('always returns empty yml', async () => {
++      expect(await extractPackageFile('', 'rpms.in.yml')).toEqual({
++        deps: [],
++        lockFiles: ['rpms.lock.yml'],
++      })
++    });
++  });
++});
+diff --git a/lib/modules/manager/rpm/extract.ts b/lib/modules/manager/rpm/extract.ts
+new file mode 100644
+index 000000000..bc9dff685
+--- /dev/null
++++ b/lib/modules/manager/rpm/extract.ts
+@@ -0,0 +1,19 @@
++import { logger } from '../../../logger';
++import type { PackageFileContent } from '../types';
++
++export async function extractPackageFile(
++  content: string,
++  packageFile: string,
++): Promise<PackageFileContent | null> {
++  logger.debug(`rpm.extractPackageFile(${packageFile})`);
++
++  let extension = packageFile.split('.').pop();
++  let lockFile = `rpms.lock.${extension}`;
++
++  logger.debug(`RPM lock file: ${lockFile}`);
++
++  return {
++    lockFiles: [lockFile],
++    deps: [],
++  };
++}
+diff --git a/lib/modules/manager/rpm/index.ts b/lib/modules/manager/rpm/index.ts
+new file mode 100644
+index 000000000..5bdc38869
+--- /dev/null
++++ b/lib/modules/manager/rpm/index.ts
+@@ -0,0 +1,14 @@
++import type { Category } from '../../../constants';
++
++export { updateArtifacts } from './artifacts';
++export { extractPackageFile } from './extract';
++
++export const supportsLockFileMaintenance = true;
++
++export const supportedDatasources = [];
++
++export const defaultConfig = {
++  fileMatch: ['(^|/)rpms\\.in\\.ya?ml$'],
++};
++
++export const categories: Category[] = ['rpm'];
+diff --git a/lib/modules/manager/rpm/types.ts b/lib/modules/manager/rpm/types.ts
+new file mode 100644
+index 000000000..b1fb4a04c
+--- /dev/null
++++ b/lib/modules/manager/rpm/types.ts
+@@ -0,0 +1,3 @@
++export interface RpmLockfile {
++  
++}
