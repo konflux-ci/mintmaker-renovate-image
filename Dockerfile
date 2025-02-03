@@ -24,6 +24,9 @@ ARG RPM_LOCKFILE_PROTOTYPE_VERSION=0.13.2
 # specified in Renovate's package.json
 ARG NODEJS_VERSION=20.17.0
 
+# Support multiple Go versions
+ENV GOTOOLCHAIN=auto
+
 # Using OpenSSL store allows for external modifications of the store. It is needed for the internal Red Hat cert.
 ENV NODE_OPTIONS=--use-openssl-ca
 
