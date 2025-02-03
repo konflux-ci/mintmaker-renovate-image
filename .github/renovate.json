@@ -17,6 +17,30 @@
             "ARG RPM_LOCKFILE_PROTOTYPE_VERSION=(?<currentValue>[\\d\\.]+)"
         ],
         "versioningTemplate": "semver"
+    },
+    {
+        "fileMatch": [
+            "^Dockerfile$"
+        ],
+        "customType": "regex",
+        "datasourceTemplate": "github-tags",
+        "depNameTemplate": "renovatebot/renovate",
+        "matchStrings": [
+            "ARG RENOVATE_VERSION=(?<currentValue>[\\d\\.]+)"
+        ],
+        "versioningTemplate": "semver"
+    },
+    {
+        "fileMatch": [
+            "^Dockerfile$"
+        ],
+        "customType": "regex",
+        "datasourceTemplate": "npm",
+        "depNameTemplate": "node",
+        "matchStrings": [
+            "ARG NODEJS_VERSION=(?<currentValue>[\\d\\.]+)"
+        ],
+        "versioningTemplate": "npm"
     }
   ]
 }
