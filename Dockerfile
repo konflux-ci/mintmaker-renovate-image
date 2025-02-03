@@ -46,7 +46,6 @@ RUN microdnf update -y && \
         python3-pip \
         python3-dnf \
         python3.9 \
-        cargo \
         golang \
         skopeo \
         xz \
@@ -86,7 +85,7 @@ USER 1001
 # Enable renovate user's bin dirs,
 #   ~/.local/bin for Python executables
 #   ~/node_modules/.bin for renovate
-ENV PATH="/home/renovate/.local/bin:/home/renovate/node_modules/.bin:/home/renovate/go/bin:/home/renovate/.pyenv/bin:/tmp/renovate/cache/others/go/bin:${PATH}"
+ENV PATH="/home/renovate/.local/bin:/home/renovate/node_modules/.bin:/home/renovate/go/bin:/home/renovate/.pyenv/bin:/home/renovate/.cargo/bin:/tmp/renovate/cache/others/go/bin:${PATH}"
 
 # Install package managers
 RUN npm install pnpm@9.2.0 && npm cache clean --force
@@ -109,6 +108,9 @@ ENV PATH="${PATH}:/home/renovate/python3.10/bin"
 
 RUN $PYENV_ROOT/plugins/python-build/bin/python-build $(pyenv latest -f -k 3.13) $HOME/python3.13
 ENV PATH="${PATH}:/home/renovate/python3.13/bin"
+
+# Use rustup to install the latest Rust toolchain
+RUN curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh -s -- -y
 
 WORKDIR /home/renovate/renovate
 
