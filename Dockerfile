@@ -18,7 +18,7 @@ ARG RENOVATE_VERSION=38.132.0-rpm
 
 # Version for the rpm-lockfile-prototype executable from
 # https://github.com/konflux-ci/rpm-lockfile-prototype/tags
-ARG RPM_LOCKFILE_PROTOTYPE_VERSION=0.13.1
+ARG RPM_LOCKFILE_PROTOTYPE_VERSION=0.13.2
 
 # NodeJS version used for Renovate, has to satisfy the version
 # specified in Renovate's package.json
@@ -31,6 +31,9 @@ ENV GOTOOLCHAIN=auto
 ENV NODE_OPTIONS=--use-openssl-ca
 
 ENV LANG=C.UTF-8
+
+# PYENV_ROOT is also set in ~/.profile, but the file isn't always read
+ENV PYENV_ROOT="/home/renovate/.pyenv"
 
 RUN microdnf update -y && \
     microdnf install -y \
@@ -61,6 +64,8 @@ RUN microdnf update -y && \
 
 RUN curl -L -o /tmp/tkn.tar.gz https://github.com/tektoncd/cli/releases/download/v0.38.1/tkn_0.38.1_Linux_x86_64.tar.gz && tar xvzf /tmp/tkn.tar.gz -C /usr/bin/ tkn && rm -f /tmp/tkn.tar.gz
 
+RUN curl -L https://github.com/mikefarah/yq/releases/download/v4.45.1/yq_linux_amd64 -o /usr/bin/yq && chmod +x /usr/bin/yq
+
 # Install nodejs
 RUN curl -o node-v${NODEJS_VERSION}-linux-x64.tar.xz https://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-x64.tar.xz
 RUN tar xf node-v${NODEJS_VERSION}-linux-x64.tar.xz && \
@@ -88,13 +93,22 @@ RUN npm install pnpm@9.2.0 && npm cache clean --force
 
 # Use virtualenv isolation to avoid dependency issues with other global packages
 RUN pip3.12 install --user pipx && pip3.12 cache purge
-RUN pipx install --python python3.12 poetry pdm pipenv hashin uv hatch pip-tools && rm -fr ~/.cache/pipx && pip3.12 cache purge
+RUN pipx install --python python3.12 poetry pdm pipenv hashin uv hatch pip-tools \
+    git+https://github.com/konflux-ci/pipeline-migration-tool.git && \
+    rm -fr ~/.cache/pipx && pip3.12 cache purge
 
 # Install pyenv
 RUN curl https://pyenv.run | sh
 RUN echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile && \
     echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile && \
     echo 'eval "$(pyenv init -)"' >> ~/.profile
+
+# Install additional Python versions
+RUN $PYENV_ROOT/plugins/python-build/bin/python-build $(pyenv latest -f -k 3.10) $HOME/python3.10
+ENV PATH="${PATH}:/home/renovate/python3.10/bin"
+
+RUN $PYENV_ROOT/plugins/python-build/bin/python-build $(pyenv latest -f -k 3.13) $HOME/python3.13
+ENV PATH="${PATH}:/home/renovate/python3.13/bin"
 
 WORKDIR /home/renovate/renovate
 
