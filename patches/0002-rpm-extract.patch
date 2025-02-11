@@ -1,0 +1,1007 @@
+diff --git a/lib/modules/datasource/api.ts b/lib/modules/datasource/api.ts
+index a9839f4f7..bbdb8e3b6 100644
+--- a/lib/modules/datasource/api.ts
++++ b/lib/modules/datasource/api.ts
+@@ -56,6 +56,7 @@ import { PuppetForgeDatasource } from './puppet-forge';
+ import { PypiDatasource } from './pypi';
+ import { PythonVersionDatasource } from './python-version';
+ import { RepologyDatasource } from './repology';
++import { RPMLockfileDatasource } from './rpm-lockfile';
+ import { RubyVersionDatasource } from './ruby-version';
+ import { RubygemsDatasource } from './rubygems';
+ import { SbtPackageDatasource } from './sbt-package';
+@@ -129,6 +130,7 @@ api.set(PuppetForgeDatasource.id, new PuppetForgeDatasource());
+ api.set(PypiDatasource.id, new PypiDatasource());
+ api.set(PythonVersionDatasource.id, new PythonVersionDatasource());
+ api.set(RepologyDatasource.id, new RepologyDatasource());
++api.set(RPMLockfileDatasource.id, new RPMLockfileDatasource());
+ api.set(RubyVersionDatasource.id, new RubyVersionDatasource());
+ api.set(RubygemsDatasource.id, new RubygemsDatasource());
+ api.set(SbtPackageDatasource.id, new SbtPackageDatasource());
+diff --git a/lib/modules/datasource/rpm-lockfile/index.ts b/lib/modules/datasource/rpm-lockfile/index.ts
+new file mode 100644
+index 000000000..88671d31a
+--- /dev/null
++++ b/lib/modules/datasource/rpm-lockfile/index.ts
+@@ -0,0 +1,67 @@
++import { logger } from '../../../logger';
++import { readLocalFile } from '../../../util/fs';
++import { parseSingleYaml } from '../../../util/yaml';
++import { RedHatRPMLockfile } from '../../manager/rpm/schema';
++import type { RedHatRPMLockfileDefinition } from '../../manager/rpm/schema';
++import { Datasource } from '../datasource';
++import type { GetReleasesConfig, ReleaseResult } from '../types';
++
++export class RPMLockfileDatasource extends Datasource {
++  static readonly id = 'rpm-lockfile';
++  dependencyUpdateData: Map<string, string> = new Map();
++  dependencyCheckInitiated = false;
++
++  constructor() {
++    super(RPMLockfileDatasource.id);
++  }
++
++  async loadUpdatedLockfile(): Promise<void> {
++    const newLockFileContent = await readLocalFile(
++      'rpms.lock.tmp.yaml',
++      'utf8',
++    );
++
++    if (newLockFileContent === null) {
++      logger.debug('New lockfile content is null');
++      return;
++    }
++
++    const lockFile: RedHatRPMLockfileDefinition = parseSingleYaml(
++      newLockFileContent,
++      { customSchema: RedHatRPMLockfile },
++    );
++
++    for (const arch of lockFile.arches) {
++      for (const dependency of arch.packages) {
++        if (!this.dependencyUpdateData.has(dependency.name)) {
++          this.dependencyUpdateData.set(dependency.name, dependency.evr);
++        }
++      }
++    }
++  }
++
++  override async getReleases(
++    getReleasesConfig: GetReleasesConfig,
++  ): Promise<ReleaseResult | null> {
++    if (!this.dependencyCheckInitiated) {
++      await this.loadUpdatedLockfile();
++      this.dependencyCheckInitiated = true;
++    }
++
++    const packageVersion = this.dependencyUpdateData.get(
++      getReleasesConfig.packageName,
++    );
++
++    if (packageVersion === undefined) {
++      return null;
++    }
++
++    return {
++      releases: [
++        {
++          version: packageVersion,
++        },
++      ],
++    };
++  }
++}
+diff --git a/lib/modules/manager/api.ts b/lib/modules/manager/api.ts
+index ff184bbe7..bc2c1e2c6 100644
+--- a/lib/modules/manager/api.ts
++++ b/lib/modules/manager/api.ts
+@@ -77,11 +77,11 @@ import * as pip_requirements from './pip_requirements';
+ import * as pip_setup from './pip_setup';
+ import * as pipenv from './pipenv';
+ import * as poetry from './poetry';
+-import * as rpm from './rpm';
+ import * as preCommit from './pre-commit';
+ import * as pub from './pub';
+ import * as puppet from './puppet';
+ import * as pyenv from './pyenv';
++import * as rpm from './rpm';
+ import * as rubyVersion from './ruby-version';
+ import * as runtimeVersion from './runtime-version';
+ import * as sbt from './sbt';
+diff --git a/lib/modules/manager/rpm/__fixtures__/rpms.lock.0.yaml b/lib/modules/manager/rpm/__fixtures__/rpms.lock.0.yaml
+new file mode 100644
+index 000000000..178e91c30
+--- /dev/null
++++ b/lib/modules/manager/rpm/__fixtures__/rpms.lock.0.yaml
+@@ -0,0 +1,242 @@
++---
++lockfileVersion: 1
++lockfileVendor: redhat
++arches:
++- arch: x86_64
++  packages:
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/c/cargo-1.75.0-1.el9.x86_64.rpm
++    repoid: ubi-9-appstream-rpms
++    size: 6705303
++    checksum: sha256:0561082ed6cf1e36108095c4ff72beb3d4b1d2d20b5f4c80308b4c3d273e777e
++    name: cargo
++    evr: 1.75.0-1.el9
++    sourcerpm: rust-1.75.0-1.el9.src.rpm
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/c/cpp-11.4.1-3.el9.x86_64.rpm
++    repoid: ubi-9-appstream-rpms
++    size: 11153534
++    checksum: sha256:45907c9130a09f20f2e7bdb09f7371a1b6221c161a492dfab0a744fbe5e66e7e
++    name: cpp
++    evr: 11.4.1-3.el9
++    sourcerpm: gcc-11.4.1-3.el9.src.rpm
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/g/gcc-11.4.1-3.el9.x86_64.rpm
++    repoid: ubi-9-appstream-rpms
++    size: 33805852
++    checksum: sha256:18668f95c29b72e90ff42811a378c8c2ee8db71aff07de09a156aa7388720cb8
++    name: gcc
++    evr: 11.4.1-3.el9
++    sourcerpm: gcc-11.4.1-3.el9.src.rpm
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/g/glibc-devel-2.34-100.el9_4.4.x86_64.rpm
++    repoid: ubi-9-appstream-rpms
++    size: 36205
++    checksum: sha256:c7c88469c845e5550037d17d544c2fdcde683e6410e6aad77b5cdd09580d15ca
++    name: glibc-devel
++    evr: 2.34-100.el9_4.4
++    sourcerpm: glibc-2.34-100.el9_4.4.src.rpm
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/g/glibc-headers-2.34-100.el9_4.4.x86_64.rpm
++    repoid: ubi-9-appstream-rpms
++    size: 553893
++    checksum: sha256:2dc0c045df41e6d5f34c846a8c8ffd77b1618bdd05b920f85bb27742b208bcff
++    name: glibc-headers
++    evr: 2.34-100.el9_4.4
++    sourcerpm: glibc-2.34-100.el9_4.4.src.rpm
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/k/kernel-headers-5.14.0-427.42.1.el9_4.x86_64.rpm
++    repoid: ubi-9-appstream-rpms
++    size: 6578513
++    checksum: sha256:a7767c560b0ca3864c47284316c73f58a7ff01b0be46ec4330a635b19ad80f5f
++    name: kernel-headers
++    evr: 5.14.0-427.42.1.el9_4
++    sourcerpm: kernel-5.14.0-427.42.1.el9_4.src.rpm
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/l/libmpc-1.2.1-4.el9.x86_64.rpm
++    repoid: ubi-9-appstream-rpms
++    size: 66075
++    checksum: sha256:b97b4e98c3c6f41dcfc2ceb4ffa1aba7a338b7cfd9e6c4f63e3160dd3cc033d3
++    name: libmpc
++    evr: 1.2.1-4.el9
++    sourcerpm: libmpc-1.2.1-4.el9.src.rpm
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/l/libxcrypt-devel-4.4.18-3.el9.x86_64.rpm
++    repoid: ubi-9-appstream-rpms
++    size: 33101
++    checksum: sha256:c1d171391a7d2e043a6953efd3df3e01edc9b4c6cdb54517e1608d204a5fce18
++    name: libxcrypt-devel
++    evr: 4.4.18-3.el9
++    sourcerpm: libxcrypt-4.4.18-3.el9.src.rpm
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/l/llvm-libs-17.0.6-5.el9.x86_64.rpm
++    repoid: ubi-9-appstream-rpms
++    size: 25743310
++    checksum: sha256:1e9e470c0385fee6e35abff00e417338437ee70685040ff4b343129a0ce66ec5
++    name: llvm-libs
++    evr: 17.0.6-5.el9
++    sourcerpm: llvm-17.0.6-5.el9.src.rpm
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/r/rust-1.75.0-1.el9.x86_64.rpm
++    repoid: ubi-9-appstream-rpms
++    size: 25577052
++    checksum: sha256:16d70ef1f6c9884ced2b9f3e656c2dddddc0d4774fb90fe0e04a8506df28e4d6
++    name: rust
++    evr: 1.75.0-1.el9
++    sourcerpm: rust-1.75.0-1.el9.src.rpm
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/r/rust-std-static-1.75.0-1.el9.x86_64.rpm
++    repoid: ubi-9-appstream-rpms
++    size: 30413394
++    checksum: sha256:da08841a5404b0923cd66fbda617ed279bbc2da62b3915d7475c26fb59770845
++    name: rust-std-static
++    evr: 1.75.0-1.el9
++    sourcerpm: rust-1.75.0-1.el9.src.rpm
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/b/binutils-2.35.2-43.el9.x86_64.rpm
++    repoid: ubi-9-baseos-rpms
++    size: 4814336
++    checksum: sha256:699736ac7d7c7923698dc5e441bdbf6d70f35eeba7ae43d6606ce5dbbf1ec2fb
++    name: binutils
++    evr: 2.35.2-43.el9
++    sourcerpm: binutils-2.35.2-43.el9.src.rpm
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/b/binutils-gold-2.35.2-43.el9.x86_64.rpm
++    repoid: ubi-9-baseos-rpms
++    size: 754052
++    checksum: sha256:943aaa9fcd7455f453d9cb7b2b54b2fdd5d312ee7f88f2f586db666c89260936
++    name: binutils-gold
++    evr: 2.35.2-43.el9
++    sourcerpm: binutils-2.35.2-43.el9.src.rpm
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/e/elfutils-debuginfod-client-0.190-2.el9.x86_64.rpm
++    repoid: ubi-9-baseos-rpms
++    size: 39619
++    checksum: sha256:8318e4801d9a4e5cb9c0b647b8b3c1d969627d8f8ced0d5220bdddf668583e63
++    name: elfutils-debuginfod-client
++    evr: 0.190-2.el9
++    sourcerpm: elfutils-0.190-2.el9.src.rpm
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/g/glibc-2.34-100.el9_4.4.x86_64.rpm
++    repoid: ubi-9-baseos-rpms
++    size: 2066882
++    checksum: sha256:f2ab157525ff3ab2d4e6fa0d77fa58e0d6174a167a6c378d9302f146926f6bdb
++    name: glibc
++    evr: 2.34-100.el9_4.4
++    sourcerpm: glibc-2.34-100.el9_4.4.src.rpm
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/g/glibc-common-2.34-100.el9_4.4.x86_64.rpm
++    repoid: ubi-9-baseos-rpms
++    size: 314113
++    checksum: sha256:85f9311225af5fdd235f23b63f243058aeee9b65b14c55a2d9bbdd1409de8970
++    name: glibc-common
++    evr: 2.34-100.el9_4.4
++    sourcerpm: glibc-2.34-100.el9_4.4.src.rpm
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/g/glibc-langpack-en-2.34-100.el9_4.4.x86_64.rpm
++    repoid: ubi-9-baseos-rpms
++    size: 674961
++    checksum: sha256:404ea4f5108366a13109b46230ced6e7fe96fdf6aa90ea2bcf9b63f25ba1a702
++    name: glibc-langpack-en
++    evr: 2.34-100.el9_4.4
++    sourcerpm: glibc-2.34-100.el9_4.4.src.rpm
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/g/glibc-minimal-langpack-2.34-100.el9_4.4.x86_64.rpm
++    repoid: ubi-9-baseos-rpms
++    size: 21129
++    checksum: sha256:1e85eceb7b60d23c1f9f93373e3a03d1938fe8362ff5dca9889226984149570c
++    name: glibc-minimal-langpack
++    evr: 2.34-100.el9_4.4
++    sourcerpm: glibc-2.34-100.el9_4.4.src.rpm
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/l/libedit-3.1-38.20210216cvs.el9.x86_64.rpm
++    repoid: ubi-9-baseos-rpms
++    size: 109330
++    checksum: sha256:9e41ff5754a5dca1308adf9617828934d56cb60d8d08f128f80e4328f69bc78c
++    name: libedit
++    evr: 3.1-38.20210216cvs.el9
++    sourcerpm: libedit-3.1-38.20210216cvs.el9.src.rpm
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/l/libpkgconf-1.7.3-10.el9.x86_64.rpm
++    repoid: ubi-9-baseos-rpms
++    size: 38387
++    checksum: sha256:4feae5941b73640bd86b8d506a657cac5b770043db1464fbcd207721b2159dda
++    name: libpkgconf
++    evr: 1.7.3-10.el9
++    sourcerpm: pkgconf-1.7.3-10.el9.src.rpm
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/m/make-4.3-8.el9.x86_64.rpm
++    repoid: ubi-9-baseos-rpms
++    size: 553896
++    checksum: sha256:561f0c2251e9217c81a6c88de4d2d9231a039aaab37e8a0d2559d36ce9fa85fd
++    name: make
++    evr: 1:4.3-8.el9
++    sourcerpm: make-4.3-8.el9.src.rpm
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/p/pkgconf-1.7.3-10.el9.x86_64.rpm
++    repoid: ubi-9-baseos-rpms
++    size: 45675
++    checksum: sha256:bb47b4ecc499c308f41031a99e723827d152d5d750f59849d0c265d820944a26
++    name: pkgconf
++    evr: 1.7.3-10.el9
++    sourcerpm: pkgconf-1.7.3-10.el9.src.rpm
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/p/pkgconf-m4-1.7.3-10.el9.noarch.rpm
++    repoid: ubi-9-baseos-rpms
++    size: 16054
++    checksum: sha256:91bafd6e06099451f60288327b275cfcc651822f6145176a157c6b0fa5131e02
++    name: pkgconf-m4
++    evr: 1.7.3-10.el9
++    sourcerpm: pkgconf-1.7.3-10.el9.src.rpm
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/p/pkgconf-pkg-config-1.7.3-10.el9.x86_64.rpm
++    repoid: ubi-9-baseos-rpms
++    size: 12438
++    checksum: sha256:9a502d81d73d3303ceb53a06ad7ce525c97117ea64352174a33708bf3429283d
++    name: pkgconf-pkg-config
++    evr: 1.7.3-10.el9
++    sourcerpm: pkgconf-1.7.3-10.el9.src.rpm
++  source:
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/source/SRPMS/Packages/l/libmpc-1.2.1-4.el9.src.rpm
++    repoid: ubi-9-appstream-source
++    size: 846236
++    checksum: sha256:47774c27b65e63251f3a1cea99efbe8caed86448a573e34a44ab28ad88cc3ece
++    name: libmpc
++    evr: 1.2.1-4.el9
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/source/SRPMS/Packages/l/llvm-17.0.6-5.el9.src.rpm
++    repoid: ubi-9-appstream-source
++    size: 59744739
++    checksum: sha256:4335a8128e27010dcde5a4e1d3bca33b397a548a4f0324fcf7052194f93f4e03
++    name: llvm
++    evr: 17.0.6-5.el9
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/source/SRPMS/Packages/r/rust-1.75.0-1.el9.src.rpm
++    repoid: ubi-9-appstream-source
++    size: 161015351
++    checksum: sha256:1dae7a61bc082a5379e7e196ba607dc4a244bdc0acf1c306eb614e483a5a5ff5
++    name: rust
++    evr: 1.75.0-1.el9
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/source/SRPMS/Packages/b/binutils-2.35.2-43.el9.src.rpm
++    repoid: ubi-9-baseos-source
++    size: 22357974
++    checksum: sha256:17e3ab3a054b70e7652f10f5fde2f4f8e7c46bbf046f43d964ff6a74b9b6ab8c
++    name: binutils
++    evr: 2.35.2-43.el9
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/source/SRPMS/Packages/e/elfutils-0.190-2.el9.src.rpm
++    repoid: ubi-9-baseos-source
++    size: 9251309
++    checksum: sha256:37ca914c6d3748859317727fd88f57c6c3fa15963b510dc63a7921fc7f08f509
++    name: elfutils
++    evr: 0.190-2.el9
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/source/SRPMS/Packages/g/gcc-11.4.1-3.el9.src.rpm
++    repoid: ubi-9-baseos-source
++    size: 81835569
++    checksum: sha256:0d9d98735ede1d8cb762366d981ff9996f222c79718b68ab660afe29bc83557d
++    name: gcc
++    evr: 11.4.1-3.el9
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/source/SRPMS/Packages/g/glibc-2.34-100.el9_4.4.src.rpm
++    repoid: ubi-9-baseos-source
++    size: 18626628
++    checksum: sha256:609d4863fbcbcc09c71823c7b05065d719529c7500836bda2bc760b3f16d09f7
++    name: glibc
++    evr: 2.34-100.el9_4.4
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/source/SRPMS/Packages/l/libedit-3.1-38.20210216cvs.el9.src.rpm
++    repoid: ubi-9-baseos-source
++    size: 531597
++    checksum: sha256:067e19c3ad8c9254119e7918ef7d2af3c3d33d364d34016f4b65fb71eb1676b3
++    name: libedit
++    evr: 3.1-38.20210216cvs.el9
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/source/SRPMS/Packages/l/libxcrypt-4.4.18-3.el9.src.rpm
++    repoid: ubi-9-baseos-source
++    size: 543970
++    checksum: sha256:d18f72eb41ecd0370e2e47f1dc5774be54e9ff3b4dd333578017666c7c488f40
++    name: libxcrypt
++    evr: 4.4.18-3.el9
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/source/SRPMS/Packages/m/make-4.3-8.el9.src.rpm
++    repoid: ubi-9-baseos-source
++    size: 2335546
++    checksum: sha256:a5cc45d6c158b255cda528c496dbb8bc7783acb9898b97a39a1811230e102d7c
++    name: make
++    evr: 1:4.3-8.el9
++  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/source/SRPMS/Packages/p/pkgconf-1.7.3-10.el9.src.rpm
++    repoid: ubi-9-baseos-source
++    size: 310904
++    checksum: sha256:4d53718592b298ca7c49665b1f4e7bd32dcb42cad15c89345585da9f20d4fcae
++    name: pkgconf
++    evr: 1.7.3-10.el9
++  module_metadata: []
+diff --git a/lib/modules/manager/rpm/artifacts.spec.ts b/lib/modules/manager/rpm/artifacts.spec.ts
+index 91b28c45e..616fadab1 100644
+--- a/lib/modules/manager/rpm/artifacts.spec.ts
++++ b/lib/modules/manager/rpm/artifacts.spec.ts
+@@ -1,9 +1,9 @@
+ import { join } from 'upath';
+ import { mockExecAll } from '../../../../test/exec-util';
+ import { fs } from '../../../../test/util';
+-import { updateArtifacts } from '.';
+-import type { RepoGlobalConfig } from '../../../config/types';
+ import { GlobalConfig } from '../../../config/global';
++import type { RepoGlobalConfig } from '../../../config/types';
++import { updateArtifacts } from '.';
+ 
+ jest.mock('../../../util/fs');
+ 
+@@ -18,30 +18,21 @@ describe('modules/manager/rpm/artifacts', () => {
+       GlobalConfig.set(adminConfig);
+     });
+ 
+-    it('returns null if not in lockFileMaintenance', async () => {
+-      expect(await updateArtifacts({
+-        packageFileName: 'rpms.in.yaml',
+-        updatedDeps: [],
+-        newPackageFileContent: '',
+-        config: {
+-          updateType: 'major',
+-        }
+-      })).toBeNull();
+-    });
+-
+     it('returns null if the lock file is the same after update', async () => {
+       const execSnapshots = mockExecAll();
+ 
+       fs.readLocalFile.mockResolvedValue('Current rpms.lock.yaml');
+ 
+-      expect(await updateArtifacts({
+-        packageFileName: 'rpms.in.yaml',
+-        updatedDeps: [],
+-        newPackageFileContent: '',
+-        config: {
+-          updateType: 'lockFileMaintenance',
+-        }
+-      })).toBeNull();
++      expect(
++        await updateArtifacts({
++          packageFileName: 'rpms.in.yaml',
++          updatedDeps: [],
++          newPackageFileContent: '',
++          config: {
++            updateType: 'lockFileMaintenance',
++          },
++        }),
++      ).toBeNull();
+ 
+       expect(execSnapshots).toMatchObject([
+         { cmd: 'rpm-lockfile-prototype rpms.in.yaml' },
+@@ -54,21 +45,23 @@ describe('modules/manager/rpm/artifacts', () => {
+       fs.readLocalFile.mockResolvedValueOnce('Current rpms.lock.yaml');
+       fs.readLocalFile.mockResolvedValueOnce('New rpms.lock.yaml');
+ 
+-      expect(await updateArtifacts({
+-        packageFileName: 'rpms.in.yaml',
+-        updatedDeps: [],
+-        newPackageFileContent: '',
+-        config: {
+-          updateType: 'lockFileMaintenance',
+-        }
+-      })).toEqual([
++      expect(
++        await updateArtifacts({
++          packageFileName: 'rpms.in.yaml',
++          updatedDeps: [],
++          newPackageFileContent: '',
++          config: {
++            updateType: 'lockFileMaintenance',
++          },
++        }),
++      ).toEqual([
+         {
+           file: {
+             type: 'addition',
+             path: 'rpms.lock.yaml',
+             contents: 'New rpms.lock.yaml',
+-          }
+-        }
++          },
++        },
+       ]);
+ 
+       expect(execSnapshots).toMatchObject([
+@@ -82,21 +75,23 @@ describe('modules/manager/rpm/artifacts', () => {
+       fs.readLocalFile.mockResolvedValueOnce('Current rpms.lock.yaml');
+       fs.readLocalFile.mockResolvedValueOnce('New rpms.lock.yaml');
+ 
+-      expect(await updateArtifacts({
+-        packageFileName: 'rpms.in.yaml',
+-        updatedDeps: [],
+-        newPackageFileContent: '',
+-        config: {
+-          updateType: 'lockFileMaintenance',
+-        }
+-      })).toEqual([
++      expect(
++        await updateArtifacts({
++          packageFileName: 'rpms.in.yaml',
++          updatedDeps: [],
++          newPackageFileContent: '',
++          config: {
++            updateType: 'lockFileMaintenance',
++          },
++        }),
++      ).toEqual([
+         {
+           file: {
+             type: 'addition',
+             path: 'rpms.lock.yaml',
+             contents: 'New rpms.lock.yaml',
+-          }
+-        }
++          },
++        },
+       ]);
+ 
+       expect(execSnapshots).toMatchObject([
+diff --git a/lib/modules/manager/rpm/artifacts.ts b/lib/modules/manager/rpm/artifacts.ts
+index 88268ab78..e1f18ce6e 100644
+--- a/lib/modules/manager/rpm/artifacts.ts
++++ b/lib/modules/manager/rpm/artifacts.ts
+@@ -1,9 +1,9 @@
+-import type { UpdateArtifact, UpdateArtifactsResult } from "../types";
+-import { logger } from "../../../logger";
+-import { deleteLocalFile, readLocalFile } from "../../../util/fs";
++import { TEMPORARY_ERROR } from '../../../constants/error-messages';
++import { logger } from '../../../logger';
+ import { exec } from '../../../util/exec';
+ import type { ExecOptions } from '../../../util/exec/types';
+-import { TEMPORARY_ERROR } from '../../../constants/error-messages';
++import { deleteLocalFile, readLocalFile } from '../../../util/fs';
++import type { UpdateArtifact, UpdateArtifactsResult } from '../types';
+ 
+ export async function updateArtifacts({
+   packageFileName,
+@@ -12,15 +12,9 @@ export async function updateArtifacts({
+   config,
+ }: UpdateArtifact): Promise<UpdateArtifactsResult[] | null> {
+   logger.debug(`rpm.updateArtifacts(${packageFileName})`);
+-  const isLockFileMaintenance = config.updateType === 'lockFileMaintenance';
+-
+-  if (!isLockFileMaintenance) {
+-    logger.debug('Must be in lockFileMaintenance for rpm manager');
+-    return null;
+-  }
+-
+-  let extension = packageFileName.split('.').pop();
+-  let lockFileName = `rpms.lock.${extension}`;
++  const extension = packageFileName.split('.').pop();
++  const lockFileName = `rpms.lock.${extension}`;
++  const outputName = 'rpms.lock.tmp.yaml';
+ 
+   logger.debug(`RPM lock file: ${lockFileName}`);
+ 
+@@ -33,15 +27,15 @@ export async function updateArtifacts({
+   try {
+     await deleteLocalFile(lockFileName);
+ 
+-    cmd.push(`rpm-lockfile-prototype ${packageFileName}`);
++    cmd.push(`caching-rpm-lockfile-prototype ${packageFileName} --outfile ${outputName}`);
+ 
+     const execOptions: ExecOptions = {
+       cwdFile: packageFileName,
+-    }
++    };
+ 
+     await exec(cmd, execOptions);
+ 
+-    const newLockFileContent = await readLocalFile(lockFileName, 'utf8');
++    const newLockFileContent = await readLocalFile(outputName, 'utf8');
+ 
+     if (existingLockFileContent === newLockFileContent) {
+       logger.debug(`${lockFileName} is unchanged`);
+@@ -56,8 +50,8 @@ export async function updateArtifacts({
+           type: 'addition',
+           path: lockFileName,
+           contents: newLockFileContent,
+-        }
+-      }
++        },
++      },
+     ];
+   } catch (err) {
+     if (err.message === TEMPORARY_ERROR) {
+diff --git a/lib/modules/manager/rpm/extract.spec.ts b/lib/modules/manager/rpm/extract.spec.ts
+index b8a72e6b9..723b58683 100644
+--- a/lib/modules/manager/rpm/extract.spec.ts
++++ b/lib/modules/manager/rpm/extract.spec.ts
+@@ -1,19 +1,222 @@
++import { Fixtures } from '../../../../test/fixtures';
++import { fs } from '../../../../test/util';
+ import { extractPackageFile } from '.';
+ 
++jest.mock('../../../util/fs');
++
++const lockFile0yaml = Fixtures.get('rpms.lock.0.yaml');
++
+ describe('modules/manager/rpm/extract', () => {
+   describe('extractPackageFile()', () => {
+-    it('always returns empty yaml', async () => {
++    it('returns empty dependencies for empty yaml', async () => {
+       expect(await extractPackageFile('', 'rpms.in.yaml')).toEqual({
+         deps: [],
+         lockFiles: ['rpms.lock.yaml'],
+-      })
++      });
+     });
+ 
+-    it('always returns empty yml', async () => {
+-      expect(await extractPackageFile('', 'rpms.in.yml')).toEqual({
+-        deps: [],
+-        lockFiles: ['rpms.lock.yml'],
+-      })
++    it('extracts multiple dependencies', async () => {
++      fs.localPathExists.mockResolvedValueOnce(true);
++      fs.readLocalFile.mockResolvedValueOnce(lockFile0yaml);
++
++      const res = await extractPackageFile('', 'rpms.in.yaml');
++      expect(res?.deps).toHaveLength(24);
++      expect(res).toMatchObject({
++        deps: [
++          {
++            depName: 'cargo',
++            packageName: 'cargo',
++            currentValue: '1.75.0-1.el9',
++            currentVersion: '1.75.0-1.el9',
++            datasource: 'rpm-lockfile',
++            versioning: 'rpm',
++          },
++          {
++            depName: 'cpp',
++            packageName: 'cpp',
++            currentValue: '11.4.1-3.el9',
++            currentVersion: '11.4.1-3.el9',
++            datasource: 'rpm-lockfile',
++            versioning: 'rpm',
++          },
++          {
++            depName: 'gcc',
++            packageName: 'gcc',
++            currentValue: '11.4.1-3.el9',
++            currentVersion: '11.4.1-3.el9',
++            datasource: 'rpm-lockfile',
++            versioning: 'rpm',
++          },
++          {
++            depName: 'glibc-devel',
++            packageName: 'glibc-devel',
++            currentValue: '2.34-100.el9_4.4',
++            currentVersion: '2.34-100.el9_4.4',
++            datasource: 'rpm-lockfile',
++            versioning: 'rpm',
++          },
++          {
++            depName: 'glibc-headers',
++            packageName: 'glibc-headers',
++            currentValue: '2.34-100.el9_4.4',
++            currentVersion: '2.34-100.el9_4.4',
++            datasource: 'rpm-lockfile',
++            versioning: 'rpm',
++          },
++          {
++            depName: 'kernel-headers',
++            packageName: 'kernel-headers',
++            currentValue: '5.14.0-427.42.1.el9_4',
++            currentVersion: '5.14.0-427.42.1.el9_4',
++            datasource: 'rpm-lockfile',
++            versioning: 'rpm',
++          },
++          {
++            depName: 'libmpc',
++            packageName: 'libmpc',
++            currentValue: '1.2.1-4.el9',
++            currentVersion: '1.2.1-4.el9',
++            datasource: 'rpm-lockfile',
++            versioning: 'rpm',
++          },
++          {
++            depName: 'libxcrypt-devel',
++            packageName: 'libxcrypt-devel',
++            currentValue: '4.4.18-3.el9',
++            currentVersion: '4.4.18-3.el9',
++            datasource: 'rpm-lockfile',
++            versioning: 'rpm',
++          },
++          {
++            depName: 'llvm-libs',
++            packageName: 'llvm-libs',
++            currentValue: '17.0.6-5.el9',
++            currentVersion: '17.0.6-5.el9',
++            datasource: 'rpm-lockfile',
++            versioning: 'rpm',
++          },
++          {
++            depName: 'rust',
++            packageName: 'rust',
++            currentValue: '1.75.0-1.el9',
++            currentVersion: '1.75.0-1.el9',
++            datasource: 'rpm-lockfile',
++            versioning: 'rpm',
++          },
++          {
++            depName: 'rust-std-static',
++            packageName: 'rust-std-static',
++            currentValue: '1.75.0-1.el9',
++            currentVersion: '1.75.0-1.el9',
++            datasource: 'rpm-lockfile',
++            versioning: 'rpm',
++          },
++          {
++            depName: 'binutils',
++            packageName: 'binutils',
++            currentValue: '2.35.2-43.el9',
++            currentVersion: '2.35.2-43.el9',
++            datasource: 'rpm-lockfile',
++            versioning: 'rpm',
++          },
++          {
++            depName: 'binutils-gold',
++            packageName: 'binutils-gold',
++            currentValue: '2.35.2-43.el9',
++            currentVersion: '2.35.2-43.el9',
++            datasource: 'rpm-lockfile',
++            versioning: 'rpm',
++          },
++          {
++            depName: 'elfutils-debuginfod-client',
++            packageName: 'elfutils-debuginfod-client',
++            currentValue: '0.190-2.el9',
++            currentVersion: '0.190-2.el9',
++            datasource: 'rpm-lockfile',
++            versioning: 'rpm',
++          },
++          {
++            depName: 'glibc',
++            packageName: 'glibc',
++            currentValue: '2.34-100.el9_4.4',
++            currentVersion: '2.34-100.el9_4.4',
++            datasource: 'rpm-lockfile',
++            versioning: 'rpm',
++          },
++          {
++            depName: 'glibc-common',
++            packageName: 'glibc-common',
++            currentValue: '2.34-100.el9_4.4',
++            currentVersion: '2.34-100.el9_4.4',
++            datasource: 'rpm-lockfile',
++            versioning: 'rpm',
++          },
++          {
++            depName: 'glibc-langpack-en',
++            packageName: 'glibc-langpack-en',
++            currentValue: '2.34-100.el9_4.4',
++            currentVersion: '2.34-100.el9_4.4',
++            datasource: 'rpm-lockfile',
++            versioning: 'rpm',
++          },
++          {
++            depName: 'glibc-minimal-langpack',
++            packageName: 'glibc-minimal-langpack',
++            currentValue: '2.34-100.el9_4.4',
++            currentVersion: '2.34-100.el9_4.4',
++            datasource: 'rpm-lockfile',
++            versioning: 'rpm',
++          },
++          {
++            depName: 'libedit',
++            packageName: 'libedit',
++            currentValue: '3.1-38.20210216cvs.el9',
++            currentVersion: '3.1-38.20210216cvs.el9',
++            datasource: 'rpm-lockfile',
++            versioning: 'rpm',
++          },
++          {
++            depName: 'libpkgconf',
++            packageName: 'libpkgconf',
++            currentValue: '1.7.3-10.el9',
++            currentVersion: '1.7.3-10.el9',
++            datasource: 'rpm-lockfile',
++            versioning: 'rpm',
++          },
++          {
++            depName: 'make',
++            packageName: 'make',
++            currentValue: '1:4.3-8.el9',
++            currentVersion: '1:4.3-8.el9',
++            datasource: 'rpm-lockfile',
++            versioning: 'rpm',
++          },
++          {
++            depName: 'pkgconf',
++            packageName: 'pkgconf',
++            currentValue: '1.7.3-10.el9',
++            currentVersion: '1.7.3-10.el9',
++            datasource: 'rpm-lockfile',
++            versioning: 'rpm',
++          },
++          {
++            depName: 'pkgconf-m4',
++            packageName: 'pkgconf-m4',
++            currentValue: '1.7.3-10.el9',
++            currentVersion: '1.7.3-10.el9',
++            datasource: 'rpm-lockfile',
++            versioning: 'rpm',
++          },
++          {
++            depName: 'pkgconf-pkg-config',
++            packageName: 'pkgconf-pkg-config',
++            currentValue: '1.7.3-10.el9',
++            currentVersion: '1.7.3-10.el9',
++            datasource: 'rpm-lockfile',
++            versioning: 'rpm',
++          },
++        ],
++      });
+     });
+   });
+ });
+diff --git a/lib/modules/manager/rpm/extract.ts b/lib/modules/manager/rpm/extract.ts
+index bc9dff685..818db01a9 100644
+--- a/lib/modules/manager/rpm/extract.ts
++++ b/lib/modules/manager/rpm/extract.ts
+@@ -1,5 +1,34 @@
+ import { logger } from '../../../logger';
+-import type { PackageFileContent } from '../types';
++import { exec } from '../../../util/exec';
++import type { ExecOptions } from '../../../util/exec/types';
++import { localPathExists, readLocalFile } from '../../../util/fs';
++import { parseSingleYaml } from '../../../util/yaml';
++import type { PackageDependency, PackageFileContent } from '../types';
++import { RedHatRPMLockfile } from './schema';
++import type { RedHatRPMLockfileDefinition } from './schema';
++
++async function getUpdatedLockfile(): Promise<void> {
++  const cmd: string[] = [];
++  const packageFileName = 'rpms.in.yaml';
++  const outputName = 'rpms.lock.tmp.yaml';
++
++  if (await localPathExists(outputName)) {
++    // Only generate the temporary lockfile once
++    return;
++  }
++
++  cmd.push(`caching-rpm-lockfile-prototype ${packageFileName} --outfile ${outputName}`);
++
++  const execOptions: ExecOptions = {
++    cwdFile: packageFileName,
++  };
++
++  try {
++    await exec(cmd, execOptions);
++  } catch (err) {
++    logger.debug({ err }, 'Unable to refresh RPM lockfile for datasource');
++  }
++}
+ 
+ export async function extractPackageFile(
+   content: string,
+@@ -7,13 +36,55 @@ export async function extractPackageFile(
+ ): Promise<PackageFileContent | null> {
+   logger.debug(`rpm.extractPackageFile(${packageFile})`);
+ 
+-  let extension = packageFile.split('.').pop();
+-  let lockFile = `rpms.lock.${extension}`;
++  const extension = packageFile.split('.').pop();
++  const lockFile = `rpms.lock.${extension}`;
+ 
+   logger.debug(`RPM lock file: ${lockFile}`);
+ 
++  const lockFileContent = await readLocalFile(lockFile, 'utf8');
++  const deps: PackageDependency[] = [];
++
++  if (lockFileContent !== null) {
++    try {
++      const lockFile: RedHatRPMLockfileDefinition = parseSingleYaml(
++        lockFileContent,
++        { customSchema: RedHatRPMLockfile },
++      );
++
++      logger.debug(`Lock file version: ${lockFile.lockfileVersion}`);
++
++      for (const arch of lockFile.arches) {
++        const arch_deps: PackageDependency[] = arch.packages.map(
++          (dependency) => {
++            return {
++              depName: dependency.name,
++              packageName: dependency.name,
++              currentValue: dependency.evr,
++              currentVersion: dependency.evr,
++              versioning: 'rpm',
++              datasource: 'rpm-lockfile',
++            };
++          },
++        );
++
++        for (const dep of arch_deps) {
++          if (deps.findIndex((d) => d.depName === dep.depName) === -1) {
++            deps.push(dep);
++          }
++        }
++      }
++    } catch (e) {
++      logger.debug({ lockFile }, `Error parsing ${lockFile}: ${e}`);
++    }
++  }
++
++  // Generate a new temporary lockfile, so that RPMLockfileDatasource
++  // can pick it up later to avoid performance problems of generating
++  // the lockfile multiple times.
++  await getUpdatedLockfile();
++
+   return {
+     lockFiles: [lockFile],
+-    deps: [],
++    deps,
+   };
+ }
+diff --git a/lib/modules/manager/rpm/index.ts b/lib/modules/manager/rpm/index.ts
+index 5bdc38869..ad3bbf026 100644
+--- a/lib/modules/manager/rpm/index.ts
++++ b/lib/modules/manager/rpm/index.ts
+@@ -2,10 +2,11 @@ import type { Category } from '../../../constants';
+ 
+ export { updateArtifacts } from './artifacts';
+ export { extractPackageFile } from './extract';
++import { RPMLockfileDatasource } from '../../datasource/rpm-lockfile';
+ 
+ export const supportsLockFileMaintenance = true;
+ 
+-export const supportedDatasources = [];
++export const supportedDatasources = [RPMLockfileDatasource.id];
+ 
+ export const defaultConfig = {
+   fileMatch: ['(^|/)rpms\\.in\\.ya?ml$'],
+diff --git a/lib/modules/manager/rpm/readme.md b/lib/modules/manager/rpm/readme.md
+new file mode 100644
+index 000000000..61d0566f0
+--- /dev/null
++++ b/lib/modules/manager/rpm/readme.md
+@@ -0,0 +1,50 @@
++The `rpm` manager works differently from the rest, since the RPM ecosystem
++isn't built on package files and lock files.
++
++The `fileMatch` for `rpm` is actually the lockfile (`rpms.lock.yaml`),
++and not the package file (`rpms.in.yaml`) as one would expect.
++This is because the package file doesn't specify RPM versions.
++
++During the dependency extraction, a temporary lockfile is generated, named
++`rpms.lock.tmp.yaml`. This serves as a fake datasource later.
++
++The dependencies are extracted from the lockfile, not from the package file,
++because again, that's where the version numbers are. These dependencies
++are later compared to the fake datasource (`rpms.lock.tmp.yaml`) so that
++it is possible to generate a list of packages with their current version
++and the new (available) version. This enables Renovate to display
++a table with dependency updates and allows us to not rely on lockFileMaintenance.
++
++However, it's currently not possible to update RPMs _individually_ due to
++dependency resolution happening in `rpm-lockfile-prototype` script, which
++doesn't support per-package updates. This is currently a limitation of the whole
++RPM ecosystem.
++
++Recommended `packageRules` configuration for the `rpm` manager:
++
++```json
++{
++  "packageRules": [
++    {
++      "groupName": "RPM updates",
++      "matchManagers": ["rpm"],
++      "commitMessageAction": "",
++      "commitMessageTopic": "RPM updates",
++      "prTitle": "RPM updates"
++    }
++  ],
++  "lockFileMaintenance": {
++    "enabled": true,
++    "recreateWhen": "always",
++    "rebaseWhen": "behind-base-branch",
++    "branchTopic": "lock-file-maintenance",
++    "schedule": ["at any time"]
++  }
++}
++```
++
++This configuration ensures clean PR titles and commit messages.
++If the updates are _not_ grouped, then each PR would contain a single
++package in the description while updating the whole lockfile anyway.
++`lockFileMaintenance` is required to create a new lockfile if it doesn't
++exist yet.
+diff --git a/lib/modules/manager/rpm/schema.ts b/lib/modules/manager/rpm/schema.ts
+new file mode 100644
+index 000000000..82208e3f2
+--- /dev/null
++++ b/lib/modules/manager/rpm/schema.ts
+@@ -0,0 +1,24 @@
++import { z } from 'zod';
++
++export const RedHatRPMLockfile = z.object({
++  lockfileVersion: z.number(),
++  lockfileVendor: z.string(),
++  arches: z.array(
++    z.object({
++      arch: z.string(),
++      packages: z.array(
++        z.object({
++          url: z.string(),
++          repoid: z.string(),
++          size: z.number(),
++          checksum: z.string(),
++          name: z.string(),
++          evr: z.string(),
++          sourcerpm: z.string(),
++        }),
++      ),
++    }),
++  ),
++});
++
++export type RedHatRPMLockfileDefinition = z.infer<typeof RedHatRPMLockfile>;
+diff --git a/lib/modules/manager/rpm/types.ts b/lib/modules/manager/rpm/types.ts
+deleted file mode 100644
+index b1fb4a04c..000000000
+--- a/lib/modules/manager/rpm/types.ts
++++ /dev/null
+@@ -1,3 +0,0 @@
+-export interface RpmLockfile {
+-  
+-}
+diff --git a/tools/docs/manager.ts b/tools/docs/manager.ts
+index 73da0d3c0..46f54bd03 100644
+--- a/tools/docs/manager.ts
++++ b/tools/docs/manager.ts
+@@ -57,6 +57,7 @@ export const CategoryNames: Record<Category, string> = {
+   perl: 'Perl',
+   php: 'PHP',
+   python: 'Python',
++  rpm: 'RPM',
+   ruby: 'Ruby',
+   rust: 'Rust',
+   swift: 'Swift',
