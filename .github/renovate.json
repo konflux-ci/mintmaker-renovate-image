@@ -17,6 +17,17 @@
             "ARG RPM_LOCKFILE_PROTOTYPE_VERSION=(?<currentValue>[\\d\\.]+)"
         ],
         "versioningTemplate": "semver"
+    },
+    {
+        "customType": "regex",
+        "fileMatch": [
+            "^Dockerfile$"
+         ],
+        "matchStrings": ["ARG RENOVATE_REVISION=(?<currentDigest>.*?)\\n"],
+        "currentValueTemplate": "develop",
+        "depNameTemplate": "redhat-exd-rebuilds/renovate",
+        "packageNameTemplate": "https://github.com/redhat-exd-rebuilds/renovate",
+        "datasourceTemplate": "git-refs"
     }
   ]
 }
