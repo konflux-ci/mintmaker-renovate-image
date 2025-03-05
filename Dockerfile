@@ -16,6 +16,9 @@ LABEL description="Mintmaker - Renovate custom image" \
 # is to differentiate the rpm lockfile enabled fork
 ARG RENOVATE_VERSION=39.158.0-rpm
 
+# Specific git commit hash from the redhat-exd-rebuilds/renovate fork
+ARG RENOVATE_REVISION=ba2fda5f629d0ce63e03958e6148a22fa3cae658
+
 # Version for the rpm-lockfile-prototype executable from
 # https://github.com/konflux-ci/rpm-lockfile-prototype/tags
 ARG RPM_LOCKFILE_PROTOTYPE_VERSION=0.13.2
@@ -112,8 +115,11 @@ ENV PATH="${PATH}:/home/renovate/python3.13/bin"
 
 WORKDIR /home/renovate/renovate
 
-# Clone Renovate from specific ref (that includes the RPM lockfile support)
-RUN git clone --depth=1 --branch develop https://github.com/redhat-exd-rebuilds/renovate.git .
+# Clone Renovate from the fork and checkout the specific commit that includes custom
+# features for RPM lockfile support and Red Hat Container/RPM vulnerability alerts
+RUN git clone --depth=1 --branch develop https://github.com/redhat-exd-rebuilds/renovate.git . \
+    && git fetch --depth 1 origin ${RENOVATE_REVISION} \
+    && git checkout ${RENOVATE_REVISION}
 
 # Replace package.json version for this build
 RUN sed -i "s/0.0.0-semantic-release/${RENOVATE_VERSION}/g" package.json
