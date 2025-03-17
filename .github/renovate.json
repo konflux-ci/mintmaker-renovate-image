@@ -19,6 +19,18 @@
         "versioningTemplate": "semver"
     },
     {
+        "fileMatch": [
+            "^Dockerfile$"
+        ],
+        "customType": "regex",
+        "datasourceTemplate": "github-tags",
+        "depNameTemplate": "konflux-ci/pipeline-migration-tool",
+        "matchStrings": [
+            "ARG PIPELINE_MIGRATION_TOOL_VERSION=(?<currentValue>[\\d\\.]+)"
+        ],
+        "versioningTemplate": "semver"
+    },
+    {
         "customType": "regex",
         "fileMatch": [
             "^Dockerfile$"
