@@ -23,6 +23,10 @@ ARG RENOVATE_REVISION=ba2fda5f629d0ce63e03958e6148a22fa3cae658
 # https://github.com/konflux-ci/rpm-lockfile-prototype/tags
 ARG RPM_LOCKFILE_PROTOTYPE_VERSION=0.13.2
 
+# Version for the pipeline-migration-tool from
+# https://github.com/konflux-ci/pipeline-migration-tool/tags
+ARG PIPELINE_MIGRATION_TOOL_VERSION=0.1.0
+
 # NodeJS version used for Renovate, has to satisfy the version
 # specified in Renovate's package.json
 ARG NODEJS_VERSION=20.17.0
@@ -97,7 +101,7 @@ RUN npm install pnpm@9.2.0 && npm cache clean --force
 # Use virtualenv isolation to avoid dependency issues with other global packages
 RUN pip3.12 install --user pipx && pip3.12 cache purge
 RUN pipx install --python python3.12 poetry pdm pipenv hashin uv hatch pip-tools \
-    git+https://github.com/konflux-ci/pipeline-migration-tool.git && \
+    git+https://github.com/konflux-ci/pipeline-migration-tool.git@v${PIPELINE_MIGRATION_TOOL_VERSION} && \
     rm -fr ~/.cache/pipx && pip3.12 cache purge
 
 # Install pyenv
