@@ -21,7 +21,7 @@ ARG RENOVATE_REVISION=ba2fda5f629d0ce63e03958e6148a22fa3cae658
 
 # Version for the rpm-lockfile-prototype executable from
 # https://github.com/konflux-ci/rpm-lockfile-prototype/tags
-ARG RPM_LOCKFILE_PROTOTYPE_VERSION=0.13.2
+ARG RPM_LOCKFILE_PROTOTYPE_VERSION=0.14.0
 
 # Version for the pipeline-migration-tool from
 # https://github.com/konflux-ci/pipeline-migration-tool/tags
