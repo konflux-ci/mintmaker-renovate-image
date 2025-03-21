@@ -17,7 +17,7 @@ LABEL description="Mintmaker - Renovate custom image" \
 ARG RENOVATE_VERSION=39.158.0-rpm
 
 # Specific git commit hash from the redhat-exd-rebuilds/renovate fork
-ARG RENOVATE_REVISION=ba2fda5f629d0ce63e03958e6148a22fa3cae658
+ARG RENOVATE_REVISION=4a38537a2619f3d70410b2e204df9496e7f64216
 
 # Version for the rpm-lockfile-prototype executable from
 # https://github.com/konflux-ci/rpm-lockfile-prototype/tags
