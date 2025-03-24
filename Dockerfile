@@ -66,7 +66,8 @@ RUN microdnf update -y && \
         libffi-devel \
         readline \
         sqlite \
-        sqlite-devel && \
+        sqlite-devel \
+        libpq-devel && \
     microdnf clean all
 
 RUN curl -L -o /tmp/tkn.tar.gz https://github.com/tektoncd/cli/releases/download/v0.38.1/tkn_0.38.1_Linux_x86_64.tar.gz && tar xvzf /tmp/tkn.tar.gz -C /usr/bin/ tkn && rm -f /tmp/tkn.tar.gz
