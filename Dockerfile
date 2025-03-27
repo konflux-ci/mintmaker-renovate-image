@@ -12,6 +12,9 @@ LABEL description="Mintmaker - Renovate custom image" \
       url="https://github.com/konflux-ci/mintmaker-renovate-image/" \
       vendor="Red Hat, Inc."
 
+# OpenShift preflight check requires licensing files under /licenses
+COPY LICENSE /licenses/LICENSE
+
 # The version number is from upstream Renovate, while the `-rpm` suffix
 # is to differentiate the rpm lockfile enabled fork
 ARG RENOVATE_VERSION=39.158.0-rpm
