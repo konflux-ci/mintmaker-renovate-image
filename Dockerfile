@@ -123,7 +123,7 @@ RUN $PYENV_ROOT/plugins/python-build/bin/python-build $(pyenv latest -f -k 3.13)
 ENV PATH="${PATH}:/home/renovate/python3.13/bin"
 
 # Install jsonnet-bundler
-RUN go install -a github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@latest
+RUN go install -a github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@latest && go clean -cache -modcache
 
 WORKDIR /home/renovate/renovate
 
