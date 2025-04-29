@@ -28,7 +28,7 @@ ARG RPM_LOCKFILE_PROTOTYPE_VERSION=0.15.0
 
 # Version for the pipeline-migration-tool from
 # https://github.com/konflux-ci/pipeline-migration-tool/tags
-ARG PIPELINE_MIGRATION_TOOL_VERSION=0.2.0
+ARG PIPELINE_MIGRATION_TOOL_VERSION=0.2.1
 
 # NodeJS version used for Renovate, has to satisfy the version
 # specified in Renovate's package.json
