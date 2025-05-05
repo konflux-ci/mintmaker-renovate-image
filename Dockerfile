@@ -17,10 +17,10 @@ COPY LICENSE /licenses/LICENSE
 
 # The version number is from upstream Renovate, while the `-rpm` suffix
 # is to differentiate the rpm lockfile enabled fork
-ARG RENOVATE_VERSION=39.158.0-rpm
+ARG RENOVATE_VERSION=39.264.0-rpm
 
 # Specific git commit hash from the redhat-exd-rebuilds/renovate fork
-ARG RENOVATE_REVISION=6579805e8c265613d93fa409346ed3a7f3e3eeab
+ARG RENOVATE_REVISION=93c1879388539ca16f6fff5d702e1fb24a8f6e2c
 
 # Version for the rpm-lockfile-prototype executable from
 # https://github.com/konflux-ci/rpm-lockfile-prototype/tags
@@ -101,7 +101,7 @@ USER 1001
 ENV PATH="/home/renovate/.local/bin:/home/renovate/node_modules/.bin:/home/renovate/go/bin:/home/renovate/.pyenv/bin:/tmp/renovate/cache/others/go/bin:${PATH}"
 
 # Install package managers
-RUN npm install pnpm@9.2.0 && npm cache clean --force
+RUN npm install pnpm@10.9.0 && npm cache clean --force
 
 # Use virtualenv isolation to avoid dependency issues with other global packages
 RUN pip3.12 install --user pipx && pip3.12 cache purge
