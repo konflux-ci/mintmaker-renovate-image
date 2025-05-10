@@ -17,8 +17,6 @@ metadata:
   name: mintmaker-renovate-image-on-push
   namespace: konflux-mintmaker-tenant
 spec:
-  timeouts:
-    pipeline: "2h30m"
   params:
   - name: git-url
     value: '{{source_url}}'
@@ -235,7 +233,6 @@ spec:
         value: $(params.build-args-file)
       runAfter:
       - prefetch-dependencies
-      timeout: "2h"
       taskRef:
         params:
         - name: name
@@ -245,6 +242,7 @@ spec:
         - name: kind
           value: task
         resolver: bundles
+      timeout: 2h0m0s
       when:
       - input: $(tasks.init.results.build)
         operator: in
@@ -537,7 +535,10 @@ spec:
       optional: true
     - name: netrc
       optional: true
-  taskRunTemplate: {}
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-mintmaker-renovate-image
+  timeouts:
+    pipeline: 2h30m0s
   workspaces:
   - name: workspace
     volumeClaimTemplate:
