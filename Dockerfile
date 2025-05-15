@@ -47,6 +47,7 @@ ENV PYENV_ROOT="/home/renovate/.pyenv"
 
 RUN microdnf update -y && \
     microdnf install -y \
+        subscription-manager-rhsm-certificates \
         git \
         openssl \
         python3.12-pip \
