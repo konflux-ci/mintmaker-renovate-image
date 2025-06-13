@@ -92,6 +92,7 @@ RUN tar xf node-v${NODEJS_VERSION}-linux-x64.tar.xz && \
 RUN useradd -lms /bin/bash -u 1001 -g 0 renovate
 RUN chmod -R 6775 /home/renovate && chown :0 /home/renovate
 RUN mkdir -p /home/renovate/.cache && chown :0 /home/renovate/.cache && chmod 6775 /home/renovate/.cache
+RUN mkdir -p /home/renovate/.local/state/pdm && chown :0 /home/renovate/.local/state/pdm && chmod 6775 /home/renovate/.local/state/pdm
 
 WORKDIR /home/renovate
 USER 1001
