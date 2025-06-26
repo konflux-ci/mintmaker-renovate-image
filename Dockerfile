@@ -20,7 +20,7 @@ COPY LICENSE /licenses/LICENSE
 ARG RENOVATE_VERSION=41.7.0-rpm
 
 # Specific git commit hash from the redhat-exd-rebuilds/renovate fork
-ARG RENOVATE_REVISION=6ba891e0d8297170a726e6cef841eb6a2580c830
+ARG RENOVATE_REVISION=89ef1a49b5689e2fd16b5844c220de5dea9cf583
 
 # Version for the rpm-lockfile-prototype executable from
 # https://github.com/konflux-ci/rpm-lockfile-prototype/tags
@@ -28,7 +28,7 @@ ARG RPM_LOCKFILE_PROTOTYPE_VERSION=0.16.0
 
 # Version for the pipeline-migration-tool from
 # https://github.com/konflux-ci/pipeline-migration-tool/tags
-ARG PIPELINE_MIGRATION_TOOL_VERSION=0.2.1
+ARG PIPELINE_MIGRATION_TOOL_VERSION=0.3.0
 
 # NodeJS version used for Renovate, has to satisfy the version
 # specified in Renovate's package.json
