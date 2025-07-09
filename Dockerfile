@@ -50,8 +50,6 @@ ARG YQ_VERSION=4.45.1
 # specified in Renovate's package.json
 ARG NODEJS_VERSION=20.17.0
 
-# Do not remove the following line, renovate uses it to propose version updates
-# renovate: datasource=npm depName=pnpm versioning=npm
 ARG PNPM_VERSION=10.9.0
 
 # Do not remove the following line, renovate uses it to propose version updates
