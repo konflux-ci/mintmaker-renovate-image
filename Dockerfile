@@ -24,15 +24,65 @@ ARG RENOVATE_REVISION=3ae29357271f532d100ef422b889c8be9ff81b05
 
 # Version for the rpm-lockfile-prototype executable from
 # https://github.com/konflux-ci/rpm-lockfile-prototype/tags
+# Do not remove the following line, renovate uses it to propose version updates
+# renovate: datasource=github-tags depName=konflux-ci/rpm-lockfile-prototype versioning=semver
 ARG RPM_LOCKFILE_PROTOTYPE_VERSION=0.16.0
 
 # Version for the pipeline-migration-tool from
 # https://github.com/konflux-ci/pipeline-migration-tool/tags
+# Do not remove the following line, renovate uses it to propose version updates
+# renovate: datasource=github-tags depName=konflux-ci/pipeline-migration-tool versioning=semver
 ARG PIPELINE_MIGRATION_TOOL_VERSION=0.3.0
+
+# Version for the tekton cli from
+# https://github.com/tektoncd/cli/tags
+# Do not remove the following line, renovate uses it to propose version updates
+# renovate: datasource=github-tags depName=tektoncd/cli versioning=semver
+ARG TEKTON_CLI_VERSION=0.38.1
+
+# Version for the yq from
+# https://github.com/mikefarah/yq/tags
+# Do not remove the following line, renovate uses it to propose version updates
+# renovate: datasource=github-tags depName=mikefarah/yq versioning=semver
+ARG YQ_VERSION=4.45.1
 
 # NodeJS version used for Renovate, has to satisfy the version
 # specified in Renovate's package.json
 ARG NODEJS_VERSION=20.17.0
+
+ARG PNPM_VERSION=10.9.0
+
+# Do not remove the following line, renovate uses it to propose version updates
+# renovate: datasource=pypi depName=pipx
+ARG PIPX_VERSION=1.7.0
+
+# Do not remove the following line, renovate uses it to propose version updates
+# renovate: datasource=pypi depName=poetry
+ARG POETRY_VERSION=2.1.2
+
+# Do not remove the following line, renovate uses it to propose version updates
+# renovate: datasource=pypi depName=pdm
+ARG PDM_VERSION=2.25.3
+
+# Do not remove the following line, renovate uses it to propose version updates
+# renovate: datasource=pypi depName=pipenv
+ARG PIPENV_VERSION=2025.0.3
+
+# Do not remove the following line, renovate uses it to propose version updates
+# renovate: datasource=pypi depName=hashin
+ARG HASHIN_VERSION=1.0.4
+
+# Do not remove the following line, renovate uses it to propose version updates
+# renovate: datasource=pypi depName=uv
+ARG UV_VERSION=0.7.18
+
+# Do not remove the following line, renovate uses it to propose version updates
+# renovate: datasource=pypi depName=hatch
+ARG HATCH_VERSION=1.14.0
+
+# Do not remove the following line, renovate uses it to propose version updates
+# renovate: datasource=pypi depName=pip-tools
+ARG PIP_TOOLS_VERSION=7.4.0
 
 # Support multiple Go versions
 ENV GOTOOLCHAIN=auto
@@ -75,9 +125,10 @@ RUN microdnf update -y && \
         krb5-devel && \
     microdnf clean all
 
-RUN curl -L -o /tmp/tkn.tar.gz https://github.com/tektoncd/cli/releases/download/v0.38.1/tkn_0.38.1_Linux_x86_64.tar.gz && tar xvzf /tmp/tkn.tar.gz -C /usr/bin/ tkn && rm -f /tmp/tkn.tar.gz
+    
+RUN curl -L -o /tmp/tkn.tar.gz https://github.com/tektoncd/cli/releases/download/v${TEKTON_CLI_VERSION}/tkn_${TEKTON_CLI_VERSION}_Linux_x86_64.tar.gz && tar xvzf /tmp/tkn.tar.gz -C /usr/bin/ tkn && rm -f /tmp/tkn.tar.gz
 
-RUN curl -L https://github.com/mikefarah/yq/releases/download/v4.45.1/yq_linux_amd64 -o /usr/bin/yq && chmod +x /usr/bin/yq
+RUN curl -L https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64 -o /usr/bin/yq && chmod +x /usr/bin/yq
 
 # Install nodejs
 RUN curl -o node-v${NODEJS_VERSION}-linux-x64.tar.xz https://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-x64.tar.xz
@@ -102,11 +153,12 @@ USER 1001
 ENV PATH="/home/renovate/.local/bin:/home/renovate/node_modules/.bin:/home/renovate/go/bin:/home/renovate/.pyenv/bin:/tmp/renovate/cache/others/go/bin:${PATH}"
 
 # Install package managers
-RUN npm install pnpm@10.9.0 && npm cache clean --force
+RUN npm install pnpm@${PNPM_VERSION} && npm cache clean --force
 
 # Use virtualenv isolation to avoid dependency issues with other global packages
-RUN pip3.12 install --user pipx && pip3.12 cache purge
-RUN pipx install --python python3.12 poetry pdm pipenv hashin uv hatch pip-tools \
+RUN pip3.12 install --user pipx==${PIPX_VERSION} && pip3.12 cache purge
+RUN pipx install --python python3.12 poetry==${POETRY_VERSION} pdm==${PDM_VERSION} pipenv==${PIPENV_VERSION} \
+    hashin==${HASHIN_VERSION} uv==${UV_VERSION} hatch==${HATCH_VERSION} pip-tools==${PIP_TOOLS_VERSION} \
     git+https://github.com/konflux-ci/pipeline-migration-tool.git@v${PIPELINE_MIGRATION_TOOL_VERSION} && \
     rm -fr ~/.cache/pipx && pip3.12 cache purge
 
