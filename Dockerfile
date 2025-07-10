@@ -54,35 +54,35 @@ ARG PNPM_VERSION=10.9.0
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=pipx
-ARG PIPX_VERSION=1.7.0
+ARG PIPX_VERSION=1.7.1
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=poetry
-ARG POETRY_VERSION=2.1.2
+ARG POETRY_VERSION=2.1.3
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=pdm
-ARG PDM_VERSION=2.25.3
+ARG PDM_VERSION=2.25.4
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=pipenv
-ARG PIPENV_VERSION=2025.0.3
+ARG PIPENV_VERSION=2025.0.4
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=hashin
-ARG HASHIN_VERSION=1.0.4
+ARG HASHIN_VERSION=1.0.5
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=uv
-ARG UV_VERSION=0.7.18
+ARG UV_VERSION=0.7.20
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=hatch
-ARG HATCH_VERSION=1.14.0
+ARG HATCH_VERSION=1.14.1
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=pip-tools
-ARG PIP_TOOLS_VERSION=7.4.0
+ARG PIP_TOOLS_VERSION=7.4.1
 
 # Support multiple Go versions
 ENV GOTOOLCHAIN=auto
