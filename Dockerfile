@@ -17,10 +17,10 @@ COPY LICENSE /licenses/LICENSE
 
 # The version number is from upstream Renovate, while the `-rpm` suffix
 # is to differentiate the rpm lockfile enabled fork
-ARG RENOVATE_VERSION=39.264.0-rpm
+ARG RENOVATE_VERSION=41.7.0-rpm
 
 # Specific git commit hash from the redhat-exd-rebuilds/renovate fork
-ARG RENOVATE_REVISION=3ae29357271f532d100ef422b889c8be9ff81b05
+ARG RENOVATE_REVISION=89ef1a49b5689e2fd16b5844c220de5dea9cf583
 
 # Version for the rpm-lockfile-prototype executable from
 # https://github.com/konflux-ci/rpm-lockfile-prototype/tags
@@ -32,7 +32,7 @@ ARG RPM_LOCKFILE_PROTOTYPE_VERSION=0.16.0
 # https://github.com/konflux-ci/pipeline-migration-tool/tags
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=github-tags depName=konflux-ci/pipeline-migration-tool versioning=semver
-ARG PIPELINE_MIGRATION_TOOL_VERSION=0.3.1
+ARG PIPELINE_MIGRATION_TOOL_VERSION=0.4.0
 
 # Version for the tekton cli from
 # https://github.com/tektoncd/cli/tags
@@ -48,9 +48,9 @@ ARG YQ_VERSION=4.46.1
 
 # NodeJS version used for Renovate, has to satisfy the version
 # specified in Renovate's package.json
-ARG NODEJS_VERSION=20.17.0
+ARG NODEJS_VERSION=20.16.0
 
-ARG PNPM_VERSION=10.9.0
+ARG PNPM_VERSION=10.12.1
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=pipx
