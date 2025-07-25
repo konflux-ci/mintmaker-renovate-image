@@ -1,7 +1,7 @@
 # Build with: podman build --ulimit nofile=65535:65535 . -t custom-renovate
 # Run with: podman run --rm <additional args> custom-renovate renovate
 
-FROM registry.access.redhat.com/ubi9-minimal
+FROM registry.access.redhat.com/ubi10-minimal
 LABEL description="Mintmaker - Renovate custom image" \
       summary="Mintmaker basic container image - a Renovate custom image" \
       maintainer="EXD Rebuilds Guild <exd-guild-rebuilds@redhat.com >" \
@@ -100,18 +100,15 @@ RUN microdnf update -y && \
         subscription-manager-rhsm-certificates \
         git \
         openssl \
-        python3.12-pip \
         python3.12 \
-        python3.11 \
-        python3.11-pip \
-        python3-pip \
+        python3.12-pip \
         python3-dnf \
-        python3.9 \
         cargo \
         golang \
         skopeo \
         xz \
         xz-devel \
+        tar \
         findutils \
         zlib-devel \
         bzip2 \
@@ -169,8 +166,14 @@ RUN echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile && \
     echo 'eval "$(pyenv init -)"' >> ~/.profile
 
 # Install additional Python versions
+RUN $PYENV_ROOT/plugins/python-build/bin/python-build $(pyenv latest -f -k 3.9) $HOME/python3.9
+ENV PATH="${PATH}:/home/renovate/python3.9/bin"
+
 RUN $PYENV_ROOT/plugins/python-build/bin/python-build $(pyenv latest -f -k 3.10) $HOME/python3.10
 ENV PATH="${PATH}:/home/renovate/python3.10/bin"
+
+RUN $PYENV_ROOT/plugins/python-build/bin/python-build $(pyenv latest -f -k 3.11) $HOME/python3.11
+ENV PATH="${PATH}:/home/renovate/python3.11/bin"
 
 RUN $PYENV_ROOT/plugins/python-build/bin/python-build $(pyenv latest -f -k 3.13) $HOME/python3.13
 ENV PATH="${PATH}:/home/renovate/python3.13/bin"
