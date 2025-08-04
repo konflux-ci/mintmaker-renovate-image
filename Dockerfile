@@ -32,7 +32,7 @@ ARG RPM_LOCKFILE_PROTOTYPE_VERSION=0.17.0
 # https://github.com/konflux-ci/pipeline-migration-tool/tags
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=github-tags depName=konflux-ci/pipeline-migration-tool versioning=semver
-ARG PIPELINE_MIGRATION_TOOL_VERSION=0.4.0
+ARG PIPELINE_MIGRATION_TOOL_VERSION=0.4.1
 
 # Version for the tekton cli from
 # https://github.com/tektoncd/cli/tags
