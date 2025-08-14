@@ -103,7 +103,6 @@ RUN microdnf update -y && \
         python3.12 \
         python3.12-pip \
         python3-dnf \
-        cargo \
         golang \
         skopeo \
         xz \
@@ -122,7 +121,7 @@ RUN microdnf update -y && \
         krb5-devel && \
     microdnf clean all
 
-    
+
 RUN curl -L -o /tmp/tkn.tar.gz https://github.com/tektoncd/cli/releases/download/v${TEKTON_CLI_VERSION}/tkn_${TEKTON_CLI_VERSION}_Linux_x86_64.tar.gz && tar xvzf /tmp/tkn.tar.gz -C /usr/bin/ tkn && rm -f /tmp/tkn.tar.gz
 
 RUN curl -L https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64 -o /usr/bin/yq && chmod +x /usr/bin/yq
@@ -147,7 +146,7 @@ USER 1001
 # Enable renovate user's bin dirs,
 #   ~/.local/bin for Python executables
 #   ~/node_modules/.bin for renovate
-ENV PATH="/home/renovate/.local/bin:/home/renovate/node_modules/.bin:/home/renovate/go/bin:/home/renovate/.pyenv/bin:/tmp/renovate/cache/others/go/bin:${PATH}"
+ENV PATH="/home/renovate/.local/bin:/home/renovate/node_modules/.bin:/home/renovate/go/bin:/home/renovate/.pyenv/bin:/home/renovate/.cargo/bin:/tmp/renovate/cache/others/go/bin:${PATH}"
 
 # Install package managers
 RUN npm install pnpm@${PNPM_VERSION} && npm cache clean --force
@@ -180,6 +179,9 @@ ENV PATH="${PATH}:/home/renovate/python3.13/bin"
 
 # Install jsonnet-bundler
 RUN go install -a github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@latest && go clean -cache -modcache
+
+# Use rustup to install the latest Rust toolchain
+RUN curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh -s -- -y
 
 WORKDIR /home/renovate/renovate
 
