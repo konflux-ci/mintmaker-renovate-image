@@ -17,10 +17,10 @@ COPY LICENSE /licenses/LICENSE
 
 # The version number is from upstream Renovate, while the `-rpm` suffix
 # is to differentiate the rpm lockfile enabled fork
-ARG RENOVATE_VERSION=41.7.0-rpm
+ARG RENOVATE_VERSION=41.90.1-rpm
 
 # Specific git commit hash from the redhat-exd-rebuilds/renovate fork
-ARG RENOVATE_REVISION=331a6c40b1a06cb86d235937de68e316d1d4ade6
+ARG RENOVATE_REVISION=b7030781a08741ddeafae1f1f5114059945c6ce4
 
 # Version for the rpm-lockfile-prototype executable from
 # https://github.com/konflux-ci/rpm-lockfile-prototype/tags
@@ -48,9 +48,9 @@ ARG YQ_VERSION=4.47.1
 
 # NodeJS version used for Renovate, has to satisfy the version
 # specified in Renovate's package.json
-ARG NODEJS_VERSION=22.17.1
+ARG NODEJS_VERSION=22.19.0
 
-ARG PNPM_VERSION=10.12.1
+ARG PNPM_VERSION=10.15.0
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=pipx
