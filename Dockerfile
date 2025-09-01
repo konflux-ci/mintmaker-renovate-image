@@ -84,6 +84,10 @@ ARG HATCH_VERSION=1.14.1
 # renovate: datasource=pypi depName=pip-tools
 ARG PIP_TOOLS_VERSION=7.5.0
 
+# Do not remove the following line, renovate uses it to propose version updates
+# renovate: datasource=github-tags depName=helm/helm
+ARG HELM_V3_VERSION=3.18.6
+
 # Support multiple Go versions
 ENV GOTOOLCHAIN=auto
 
@@ -122,8 +126,13 @@ RUN microdnf update -y && \
     microdnf clean all
 
 
+# Install tekton
 RUN curl -L -o /tmp/tkn.tar.gz https://github.com/tektoncd/cli/releases/download/v${TEKTON_CLI_VERSION}/tkn_${TEKTON_CLI_VERSION}_Linux_x86_64.tar.gz && tar xvzf /tmp/tkn.tar.gz -C /usr/bin/ tkn && rm -f /tmp/tkn.tar.gz
 
+# Install helmv3
+RUN curl -L -o /tmp/helmv3.tar.gz https://get.helm.sh/helm-v${HELM_V3_VERSION}-linux-amd64.tar.gz && tar xvzf /tmp/helmv3.tar.gz -C /tmp; mv /tmp/linux-amd64/helm /usr/bin/helm && rm -f /tmp/helmv3.tar.gz && rm -rf /tmp/linux-amd64
+
+# Install yq
 RUN curl -L https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64 -o /usr/bin/yq && chmod +x /usr/bin/yq
 
 # Install nodejs
