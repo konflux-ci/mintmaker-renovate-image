@@ -174,16 +174,16 @@ RUN echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile && \
     echo 'eval "$(pyenv init -)"' >> ~/.profile
 
 # Install additional Python versions
-RUN $PYENV_ROOT/plugins/python-build/bin/python-build $(pyenv latest -f -k 3.9) $HOME/python3.9
+RUN curl -L -o /tmp/python-3.9.tar.gz https://github.com/astral-sh/python-build-standalone/releases/download/20250902/cpython-3.9.23+20250902-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz && mkdir $HOME/python3.9 && tar xf /tmp/python-3.9.tar.gz -C $HOME/python3.9 && mv $HOME/python3.9/python/* $HOME/python3.9/ && rm -r $HOME/python3.9/python && rm /tmp/python-3.9.tar.gz
 ENV PATH="${PATH}:/home/renovate/python3.9/bin"
 
-RUN $PYENV_ROOT/plugins/python-build/bin/python-build $(pyenv latest -f -k 3.10) $HOME/python3.10
+RUN curl -L -o /tmp/python-3.10.tar.gz https://github.com/astral-sh/python-build-standalone/releases/download/20250902/cpython-3.10.18+20250902-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz && mkdir $HOME/python3.10 && tar xf /tmp/python-3.10.tar.gz -C $HOME/python3.10 && mv $HOME/python3.10/python/* $HOME/python3.10/ && rm -r $HOME/python3.10/python && rm /tmp/python-3.10.tar.gz
 ENV PATH="${PATH}:/home/renovate/python3.10/bin"
 
-RUN $PYENV_ROOT/plugins/python-build/bin/python-build $(pyenv latest -f -k 3.11) $HOME/python3.11
+RUN curl -L -o /tmp/python-3.11.tar.gz https://github.com/astral-sh/python-build-standalone/releases/download/20250902/cpython-3.11.13+20250902-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz && mkdir $HOME/python3.11 && tar xf /tmp/python-3.11.tar.gz -C $HOME/python3.11 && mv $HOME/python3.11/python/* $HOME/python3.11/ && rm -r $HOME/python3.11/python && rm /tmp/python-3.11.tar.gz
 ENV PATH="${PATH}:/home/renovate/python3.11/bin"
 
-RUN $PYENV_ROOT/plugins/python-build/bin/python-build $(pyenv latest -f -k 3.13) $HOME/python3.13
+RUN curl -L -o /tmp/python-3.13.tar.gz https://github.com/astral-sh/python-build-standalone/releases/download/20250902/cpython-3.13.7+20250902-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz && mkdir $HOME/python3.13 && tar xf /tmp/python-3.13.tar.gz -C $HOME/python3.13 && mv $HOME/python3.13/python/* $HOME/python3.13/ && rm -r $HOME/python3.13/python && rm /tmp/python-3.13.tar.gz
 ENV PATH="${PATH}:/home/renovate/python3.13/bin"
 
 # Install jsonnet-bundler
