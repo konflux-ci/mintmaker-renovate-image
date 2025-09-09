@@ -111,17 +111,7 @@ RUN microdnf update -y && \
         skopeo \
         jq \
         xz \
-        xz-devel \
         tar \
-        findutils \
-        zlib-devel \
-        bzip2 \
-        bzip2-devel \
-        ncurses-devel \
-        libffi-devel \
-        readline \
-        sqlite \
-        sqlite-devel \
         libpq-devel \
         krb5-devel && \
     microdnf clean all
