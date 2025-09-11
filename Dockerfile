@@ -109,18 +109,9 @@ RUN microdnf update -y && \
         python3-dnf \
         golang \
         skopeo \
+        jq \
         xz \
-        xz-devel \
         tar \
-        findutils \
-        zlib-devel \
-        bzip2 \
-        bzip2-devel \
-        ncurses-devel \
-        libffi-devel \
-        readline \
-        sqlite \
-        sqlite-devel \
         libpq-devel \
         krb5-devel && \
     microdnf clean all
@@ -174,17 +165,16 @@ RUN echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile && \
     echo 'eval "$(pyenv init -)"' >> ~/.profile
 
 # Install additional Python versions
-RUN $PYENV_ROOT/plugins/python-build/bin/python-build $(pyenv latest -f -k 3.9) $HOME/python3.9
-ENV PATH="${PATH}:/home/renovate/python3.9/bin"
+COPY install-python.sh /home/renovate/install-python.sh
 
-RUN $PYENV_ROOT/plugins/python-build/bin/python-build $(pyenv latest -f -k 3.10) $HOME/python3.10
-ENV PATH="${PATH}:/home/renovate/python3.10/bin"
+# Download prebuilt CPython
+RUN ./install-python.sh 3.9
+RUN ./install-python.sh 3.10
+RUN ./install-python.sh 3.11
+RUN ./install-python.sh 3.13
 
-RUN $PYENV_ROOT/plugins/python-build/bin/python-build $(pyenv latest -f -k 3.11) $HOME/python3.11
-ENV PATH="${PATH}:/home/renovate/python3.11/bin"
-
-RUN $PYENV_ROOT/plugins/python-build/bin/python-build $(pyenv latest -f -k 3.13) $HOME/python3.13
-ENV PATH="${PATH}:/home/renovate/python3.13/bin"
+# Update paths
+ENV PATH="${PATH}:/home/renovate/python3.9/bin:/home/renovate/python3.10/bin:/home/renovate/python3.11/bin:/home/renovate/python3.13/bin"
 
 # Install jsonnet-bundler
 RUN go install -a github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@latest && go clean -cache -modcache
