@@ -86,7 +86,7 @@ ARG PIP_TOOLS_VERSION=7.5.0
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=github-tags depName=helm/helm
-ARG HELM_V3_VERSION=3.18.6
+ARG HELM_V3_VERSION=3.19.0
 
 # Support multiple Go versions
 ENV GOTOOLCHAIN=auto
