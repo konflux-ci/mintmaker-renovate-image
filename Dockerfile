@@ -173,6 +173,10 @@ RUN ./install-python.sh 3.10
 RUN ./install-python.sh 3.11
 RUN ./install-python.sh 3.13
 
+# Ensure Python requests library uses system root certificates
+# Particularly important for Python virtual environments
+ENV REQUESTS_CA_BUNDLE=/etc/pki/tls/certs/ca-bundle.crt
+
 # Update paths
 ENV PATH="${PATH}:/home/renovate/python3.9/bin:/home/renovate/python3.10/bin:/home/renovate/python3.11/bin:/home/renovate/python3.13/bin"
 
