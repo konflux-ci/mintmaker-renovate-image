@@ -7,32 +7,38 @@
   },
   "packageRules": [
     {
-      "matchManagers": ["regex"],
-      "matchDatasources": ["pypi"],
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchDatasources": [
+        "pypi"
+      ],
       "groupName": "All Python Dependencies"
     }
   ],
   "customManagers": [
     {
-        "customType": "regex",
-        "fileMatch": [
-            "^Dockerfile$"
-         ],
-        "matchStrings": ["ARG RENOVATE_REVISION=(?<currentDigest>.*?)\\n"],
-        "currentValueTemplate": "develop",
-        "depNameTemplate": "redhat-exd-rebuilds/renovate",
-        "packageNameTemplate": "https://github.com/redhat-exd-rebuilds/renovate",
-        "datasourceTemplate": "git-refs"
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG RENOVATE_REVISION=(?<currentDigest>.*?)\\n"
+      ],
+      "currentValueTemplate": "develop",
+      "depNameTemplate": "redhat-exd-rebuilds/renovate",
+      "packageNameTemplate": "https://github.com/redhat-exd-rebuilds/renovate",
+      "datasourceTemplate": "git-refs"
     },
     {
-        "fileMatch": [
-            "^Dockerfile$"
-        ],
-        "customType": "regex",
-        "description": "Update dependency versions in the Dockerfile",
-        "matchStrings": [
-            "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>.+?)(?: versioning=(?<versioning>[a-z-]+?))?\\s(?:ENV|ARG) .+?_VERSION=(?<currentValue>.+?)\\s"
-        ]
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
+      ],
+      "customType": "regex",
+      "description": "Update dependency versions in the Dockerfile",
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>.+?)(?: versioning=(?<versioning>[a-z-]+?))?\\s(?:ENV|ARG) .+?_VERSION=(?<currentValue>.+?)\\s"
+      ]
     }
   ]
 }
