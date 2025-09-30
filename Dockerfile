@@ -54,7 +54,7 @@ ARG PNPM_VERSION=10.15.0
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=pipx
-ARG PIPX_VERSION=1.7.1
+ARG PIPX_VERSION=1.8.0
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=poetry
