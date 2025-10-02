@@ -82,7 +82,7 @@ ARG HATCH_VERSION=1.14.2
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=pip-tools
-ARG PIP_TOOLS_VERSION=7.5.0
+ARG PIP_TOOLS_VERSION=7.5.1
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=github-tags depName=helm/helm
