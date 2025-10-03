@@ -20,7 +20,7 @@ COPY LICENSE /licenses/LICENSE
 ARG RENOVATE_VERSION=41.90.1-rpm
 
 # Specific git commit hash from the redhat-exd-rebuilds/renovate fork
-ARG RENOVATE_REVISION=7de7a4cdf3768aaf5253ee220653cd2fb14bd450
+ARG RENOVATE_REVISION=da82c706cc40084f4e684a328a3c7e1c58d1be05
 
 # Version for the rpm-lockfile-prototype executable from
 # https://github.com/konflux-ci/rpm-lockfile-prototype/tags
