@@ -44,7 +44,7 @@ ARG TEKTON_CLI_VERSION=0.42.0
 # https://github.com/mikefarah/yq/tags
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=github-tags depName=mikefarah/yq versioning=semver
-ARG YQ_VERSION=4.47.2
+ARG YQ_VERSION=4.48.1
 
 # NodeJS version used for Renovate, has to satisfy the version
 # specified in Renovate's package.json
