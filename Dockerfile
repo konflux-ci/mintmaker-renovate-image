@@ -53,6 +53,18 @@ ARG NODEJS_VERSION=22.19.0
 ARG PNPM_VERSION=10.15.0
 
 # Do not remove the following line, renovate uses it to propose version updates
+# renovate: datasource=npm depName=yarn
+ARG YARN_VERSION=1.22.22
+
+# Do not remove the following line, renovate uses it to propose version updates
+# renovate: datasource=npm depName=bun
+ARG BUN_VERSION=1.3.0
+
+# Do not remove the following line, renovate uses it to propose version updates
+# renovate: datasource=npm depName=meteor
+ARG METEOR_VERSION=3.3.2
+
+# Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=pipx
 ARG PIPX_VERSION=1.8.0
 
@@ -149,7 +161,9 @@ USER 1001
 ENV PATH="/home/renovate/.local/bin:/home/renovate/node_modules/.bin:/home/renovate/go/bin:/home/renovate/.pyenv/bin:/home/renovate/.cargo/bin:/tmp/renovate/cache/others/go/bin:${PATH}"
 
 # Install package managers
-RUN npm install pnpm@${PNPM_VERSION} && npm cache clean --force
+RUN npm install pnpm@${PNPM_VERSION} yarn@${YARN_VERSION} bun@${BUN_VERSION} && npm cache clean --force
+RUN npx clear-npx-cache && npx meteor@${METEOR_VERSION} install
+ENV PATH="/home/renovate/.meteor:${PATH}"
 
 # Use virtualenv isolation to avoid dependency issues with other global packages
 RUN pip3.12 install --user pipx==${PIPX_VERSION} && pip3.12 cache purge
