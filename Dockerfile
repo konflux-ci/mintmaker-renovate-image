@@ -65,6 +65,10 @@ ARG BUN_VERSION=1.3.0
 ARG METEOR_VERSION=3.3.2
 
 # Do not remove the following line, renovate uses it to propose version updates
+# renovate: datasource=gem depName=bundler
+ARG BUNDLER_VERSION=2.7.2
+
+# Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=pipx
 ARG PIPX_VERSION=1.8.0
 
@@ -119,6 +123,7 @@ RUN microdnf update -y && \
         python3.12 \
         python3.12-pip \
         python3-dnf \
+        ruby \
         golang \
         skopeo \
         jq \
@@ -164,6 +169,9 @@ ENV PATH="/home/renovate/.local/bin:/home/renovate/node_modules/.bin:/home/renov
 RUN npm install pnpm@${PNPM_VERSION} yarn@${YARN_VERSION} bun@${BUN_VERSION} && npm cache clean --force
 RUN npx clear-npx-cache && npx meteor@${METEOR_VERSION} install
 ENV PATH="/home/renovate/.meteor:${PATH}"
+
+# Install bundler
+RUN gem install bundler -v ${BUNDLER_VERSION}
 
 # Use virtualenv isolation to avoid dependency issues with other global packages
 RUN pip3.12 install --user pipx==${PIPX_VERSION} && pip3.12 cache purge
