@@ -90,7 +90,7 @@ ARG UV_VERSION=0.9.3
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=hatch
-ARG HATCH_VERSION=1.15.0
+ARG HATCH_VERSION=1.15.1
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=pip-tools
