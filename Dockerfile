@@ -177,8 +177,9 @@ RUN gem install bundler -v ${BUNDLER_VERSION}
 RUN pip3.12 install --user pipx==${PIPX_VERSION} && pip3.12 cache purge
 RUN pipx install --python python3.12 poetry==${POETRY_VERSION} pdm==${PDM_VERSION} pipenv==${PIPENV_VERSION} \
     hashin==${HASHIN_VERSION} uv==${UV_VERSION} hatch==${HATCH_VERSION} pip-tools==${PIP_TOOLS_VERSION} \
-    git+https://github.com/konflux-ci/pipeline-migration-tool.git@v${PIPELINE_MIGRATION_TOOL_VERSION} && \
-    rm -fr ~/.cache/pipx && pip3.12 cache purge
+    git+https://github.com/konflux-ci/pipeline-migration-tool.git@v${PIPELINE_MIGRATION_TOOL_VERSION}\
+    && pipx inject hashin certifi\
+    && rm -fr ~/.cache/pipx && pip3.12 cache purge
 
 # Install pyenv
 RUN curl https://pyenv.run | sh
@@ -198,10 +199,6 @@ RUN ./install-python.sh 3.13
 # Ensure Python requests library uses system root certificates
 # Particularly important for Python virtual environments
 ENV REQUESTS_CA_BUNDLE=/etc/pki/tls/certs/ca-bundle.crt
-
-# Ensure Tekton doesn't rewrite SSL_CERT_DIR by declaring it explicitly
-# /etc/pki/tls/certs is the default path on Fedora/RHEL/UBI
-ENV SSL_CERT_DIR=/etc/pki/tls/certs
 
 # Update paths
 ENV PATH="${PATH}:/home/renovate/python3.9/bin:/home/renovate/python3.10/bin:/home/renovate/python3.11/bin:/home/renovate/python3.13/bin"
