@@ -199,6 +199,10 @@ RUN ./install-python.sh 3.13
 # Particularly important for Python virtual environments
 ENV REQUESTS_CA_BUNDLE=/etc/pki/tls/certs/ca-bundle.crt
 
+# Ensure Tekton doesn't rewrite SSL_CERT_DIR by declaring it explicitly
+# /etc/pki/tls/certs is the default path on Fedora/RHEL/UBI
+ENV SSL_CERT_DIR=/etc/pki/tls/certs
+
 # Update paths
 ENV PATH="${PATH}:/home/renovate/python3.9/bin:/home/renovate/python3.10/bin:/home/renovate/python3.11/bin:/home/renovate/python3.13/bin"
 
