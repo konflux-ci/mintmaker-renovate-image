@@ -195,6 +195,10 @@ RUN ./install-python.sh 3.10
 RUN ./install-python.sh 3.11
 RUN ./install-python.sh 3.13
 
+# Ensure Python requests library uses system root certificates
+# Particularly important for Python virtual environments
+ENV REQUESTS_CA_BUNDLE=/etc/pki/tls/certs/ca-bundle.crt
+
 # Ensure Tekton doesn't rewrite SSL_CERT_DIR by declaring it explicitly
 # /etc/pki/tls/certs is the default path on Fedora/RHEL/UBI
 ENV SSL_CERT_DIR=/etc/pki/tls/certs
