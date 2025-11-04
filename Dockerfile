@@ -200,6 +200,10 @@ RUN ./install-python.sh 3.13
 # Particularly important for Python virtual environments
 ENV REQUESTS_CA_BUNDLE=/etc/pki/tls/certs/ca-bundle.crt
 
+# Set paths for openssl/urllib
+ENV SSL_CERT_FILE=/etc/pki/tls/certs/ca-bundle.crt
+ENV SSL_CERT_DIR=/etc/pki/tls/certs
+
 # Update paths
 ENV PATH="${PATH}:/home/renovate/python3.9/bin:/home/renovate/python3.10/bin:/home/renovate/python3.11/bin:/home/renovate/python3.13/bin"
 
