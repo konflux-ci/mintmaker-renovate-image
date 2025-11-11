@@ -65,7 +65,7 @@ ARG BUN_VERSION=1.3.1
 ARG METEOR_VERSION=3.3.2
 
 # Do not remove the following line, renovate uses it to propose version updates
-# renovate: datasource=gem depName=bundler
+# renovate: datasource=rubygems depName=bundler
 ARG BUNDLER_VERSION=2.7.2
 
 # Do not remove the following line, renovate uses it to propose version updates
@@ -104,6 +104,18 @@ ARG PIP_TOOLS_VERSION=7.5.1
 # renovate: datasource=github-tags depName=helm/helm
 ARG HELM_V3_VERSION=3.19.0
 
+# Do not remove the following line, renovate uses it to propose version updates
+# renovate: datasource=github-tags depName=gradle/gradle
+ARG GRADLE_VERSION=9.2.0
+
+# Do not remove the following line, renovate uses it to propose version updates
+# renovate: datasource=github-tags depName=sbt/sbt
+ARG SBT_VERSION=1.11.7
+
+# Do not remove the following line, renovate uses it to propose version updates
+# renovate: datasource=github-tags depName=technomancy/leiningen
+ARG LEININGEN_VERSION=2.12.0
+
 # Support multiple Go versions
 ENV GOTOOLCHAIN=auto
 
@@ -129,6 +141,8 @@ RUN microdnf update -y && \
         jq \
         xz \
         tar \
+        zip unzip \
+        java-21-openjdk \
         libpq-devel \
         krb5-devel && \
     microdnf clean all
@@ -151,6 +165,25 @@ RUN tar xf node-v${NODEJS_VERSION}-linux-x64.tar.xz && \
     mv node-v${NODEJS_VERSION}-linux-x64/lib/* /lib/ && \
     rm -fr node-v${NODEJS_VERSION}-linux-x64 && \
     rm -f node-v${NODEJS_VERSION}-linux-x64.tar.xz
+
+# Install gradle
+RUN curl -Lo gradle.zip https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip && \
+    mkdir /opt/gradle-${GRADLE_VERSION} && unzip -d /opt/gradle-${GRADLE_VERSION} gradle.zip && \
+    rm gradle.zip && \
+    ln -s /opt/gradle-${GRADLE_VERSION}/gradle-${GRADLE_VERSION}/bin/gradle /usr/bin/gradle
+
+# Install Clojure
+RUN curl -Lo install-clojure.sh https://github.com/clojure/brew-install/releases/latest/download/linux-install.sh && \
+    chmod +x install-clojure.sh && ./install-clojure.sh && rm install-clojure.sh
+
+# Install sbt
+RUN curl -Lo sbt.tgz https://github.com/sbt/sbt/releases/download/v${SBT_VERSION}/sbt-${SBT_VERSION}.tgz && \
+    mkdir /opt/sbt-v${SBT_VERSION} && tar xf sbt.tgz -C /opt/sbt-v${SBT_VERSION} && \
+    rm sbt.tgz && \
+    ln -s /opt/sbt-v${SBT_VERSION}/sbt/bin/sbt /usr/bin/sbt
+
+# Install Lieningen
+RUN curl -Lo /usr/bin/lein https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein && chmod +x /usr/bin/lein
 
 # Add renovate user and switch to it
 RUN useradd -lms /bin/bash -u 1001 -g 0 renovate
