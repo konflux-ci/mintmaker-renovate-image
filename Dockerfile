@@ -106,7 +106,7 @@ ARG HELM_V3_VERSION=3.19.2
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=github-tags depName=gradle/gradle
-ARG GRADLE_VERSION=9.2.0
+ARG GRADLE_VERSION=9.2.1
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=github-tags depName=sbt/sbt
