@@ -225,7 +225,6 @@ RUN echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile && \
 COPY install-python.sh /home/renovate/install-python.sh
 
 # Download prebuilt CPython
-RUN ./install-python.sh 3.9
 RUN ./install-python.sh 3.10
 RUN ./install-python.sh 3.11
 RUN ./install-python.sh 3.13
@@ -240,7 +239,7 @@ ENV SSL_CERT_FILE=/etc/pki/tls/certs/ca-bundle.crt
 ENV SSL_CERT_DIR=/etc/pki/tls/certs
 
 # Update paths
-ENV PATH="${PATH}:/home/renovate/python3.9/bin:/home/renovate/python3.10/bin:/home/renovate/python3.11/bin:/home/renovate/python3.13/bin:/home/renovate/python3.14/bin"
+ENV PATH="${PATH}:/home/renovate/python3.10/bin:/home/renovate/python3.11/bin:/home/renovate/python3.13/bin:/home/renovate/python3.14/bin"
 
 # Install jsonnet-bundler
 RUN go install -a github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@latest && go clean -cache -modcache
