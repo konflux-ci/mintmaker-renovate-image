@@ -543,6 +543,13 @@ spec:
       optional: true
     - name: netrc
       optional: true
+  taskRunSpecs:
+    - pipelineTaskName: ecosystem-cert-preflight-checks
+      computeResources:
+        requests:
+          memory: 10Gi
+        limits:
+          memory: 10Gi
   taskRunTemplate:
     serviceAccountName: build-pipeline-mintmaker-renovate-image
   timeouts:
