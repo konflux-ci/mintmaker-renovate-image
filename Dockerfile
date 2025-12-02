@@ -142,7 +142,7 @@ RUN microdnf update -y && \
         xz \
         tar \
         zip unzip \
-        java-21-openjdk \
+        java-21-openjdk-devel \
         which \
         libpq-devel \
         krb5-devel && \
