@@ -25,7 +25,7 @@
       "matchStrings": [
         "ARG RENOVATE_REVISION=(?<currentDigest>.*?)\\n"
       ],
-      "currentValueTemplate": "develop",
+      "currentValueTemplate": "renovate-42-26-5",
       "depNameTemplate": "redhat-exd-rebuilds/renovate",
       "packageNameTemplate": "https://github.com/redhat-exd-rebuilds/renovate",
       "datasourceTemplate": "git-refs"
