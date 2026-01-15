@@ -66,7 +66,7 @@ ARG METEOR_VERSION=3.3.2
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=rubygems depName=bundler
-ARG BUNDLER_VERSION=4.0.3
+ARG BUNDLER_VERSION=4.0.4
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=pipx
