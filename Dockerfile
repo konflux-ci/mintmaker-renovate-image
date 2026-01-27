@@ -109,6 +109,10 @@ ARG HELM_V3_VERSION=4.1.0
 ARG GRADLE_VERSION=9.3.0
 
 # Do not remove the following line, renovate uses it to propose version updates
+# renovate: datasource=github-tags depName=clojure/brew-install
+ARG CLOJURE_VERSION=1.12.4.1582
+
+# Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=github-tags depName=sbt/sbt
 ARG SBT_VERSION=1.12.1
 
@@ -174,7 +178,7 @@ RUN curl -Lo gradle.zip https://services.gradle.org/distributions/gradle-${GRADL
     ln -s /opt/gradle-${GRADLE_VERSION}/gradle-${GRADLE_VERSION}/bin/gradle /usr/bin/gradle
 
 # Install Clojure
-RUN curl -Lo install-clojure.sh https://github.com/clojure/brew-install/releases/latest/download/linux-install.sh && \
+RUN curl -Lo install-clojure.sh https://github.com/clojure/brew-install/releases/download/${CLOJURE_VERSION}/linux-install.sh && \
     chmod +x install-clojure.sh && ./install-clojure.sh && rm install-clojure.sh
 
 # Install sbt
