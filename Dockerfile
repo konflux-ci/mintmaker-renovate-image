@@ -58,7 +58,7 @@ ARG YARN_VERSION=1.22.22
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=npm depName=bun
-ARG BUN_VERSION=1.3.6
+ARG BUN_VERSION=1.3.7
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=npm depName=meteor
