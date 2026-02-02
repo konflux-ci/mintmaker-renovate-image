@@ -62,7 +62,7 @@ ARG BUN_VERSION=1.3.8
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=npm depName=meteor
-ARG METEOR_VERSION=3.3.2
+ARG METEOR_VERSION=3.4.0
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=rubygems depName=bundler
