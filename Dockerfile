@@ -74,7 +74,7 @@ ARG PIPX_VERSION=1.8.0
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=poetry
-ARG POETRY_VERSION=2.3.1
+ARG POETRY_VERSION=2.3.2
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=pdm
