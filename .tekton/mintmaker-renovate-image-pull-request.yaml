@@ -540,6 +540,12 @@ spec:
         memory: 10Gi
       limits:
         memory: 10Gi
+  - pipelineTaskName: clamav-scan
+    computeResources:
+      requests:
+        memory: 10Gi
+      limits:
+        memory: 10Gi
   taskRunTemplate:
     serviceAccountName: build-pipeline-mintmaker-renovate-image
   timeouts:
