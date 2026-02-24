@@ -114,7 +114,7 @@ ARG CLOJURE_VERSION=1.12.4.1582
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=github-tags depName=sbt/sbt
-ARG SBT_VERSION=1.12.3
+ARG SBT_VERSION=1.12.4
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=github-tags depName=technomancy/leiningen
