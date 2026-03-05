@@ -17,10 +17,10 @@ COPY LICENSE /licenses/LICENSE
 
 # The version number is from upstream Renovate, while the `-rpm` suffix
 # is to differentiate the rpm lockfile enabled fork
-ARG RENOVATE_VERSION=42.26.5-rpm
+ARG RENOVATE_VERSION=42.99.0-rpm
 
 # Specific git commit hash from the redhat-exd-rebuilds/renovate fork
-ARG RENOVATE_REVISION=cbefce370a828822a39e3e9028e18efec4e519b3
+ARG RENOVATE_REVISION=84e89465397f5932dfc67ce26ce31ada1f577b8b
 
 # Version for the rpm-lockfile-prototype executable from
 # https://github.com/konflux-ci/rpm-lockfile-prototype/tags
