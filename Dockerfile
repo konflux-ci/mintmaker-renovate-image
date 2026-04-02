@@ -28,6 +28,12 @@ ARG RENOVATE_REVISION=6bd22d35f36abff1dc4f8fc23bdf408984f2b0af
 # renovate: datasource=github-tags depName=konflux-ci/rpm-lockfile-prototype versioning=semver
 ARG RPM_LOCKFILE_PROTOTYPE_VERSION=0.21.0
 
+# Version for the refresh-rpm-lockfiles executable from
+# https://github.com/konflux-ci/refresh-rpm-lockfiles/tags
+# Do not remove the following line, renovate uses it to propose version updates
+# renovate: datasource=github-tags depName=konflux-ci/refresh-rpm-lockfiles versioning=semver
+ARG REFRESH_RPM_LOCKFILES_VERSION=0.1.0
+
 # Version for the pipeline-migration-tool from
 # https://github.com/konflux-ci/pipeline-migration-tool/tags
 # Do not remove the following line, renovate uses it to propose version updates
@@ -268,6 +274,9 @@ RUN pnpm install && pnpm build && npm install --prefix /home/renovate . && pnpm 
 
 # Run pipx install with the --system-site-packages so rpm-lockfile-prototype can use the system's python3-dnf package
 RUN pipx install --python python3.12 git+https://github.com/konflux-ci/rpm-lockfile-prototype.git@v${RPM_LOCKFILE_PROTOTYPE_VERSION} --system-site-packages && \
+    rm -fr ~/.cache/pipx && pip3.12 cache purge
+
+RUN pipx install --python python3.12 git+https://github.com/konflux-ci/refresh-rpm-lockfiles.git@v${REFRESH_RPM_LOCKFILES_VERSION} && \
     rm -fr ~/.cache/pipx && pip3.12 cache purge
 
 WORKDIR /workspace
