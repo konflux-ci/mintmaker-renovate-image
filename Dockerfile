@@ -256,7 +256,7 @@ WORKDIR /home/renovate/renovate
 
 # Clone Renovate from the fork and checkout the specific commit that includes custom
 # features for RPM lockfile support and Red Hat Container/RPM vulnerability alerts
-RUN git clone --depth=1 --branch develop https://github.com/redhat-exd-rebuilds/renovate.git . \
+RUN git clone --depth=1 --branch renovate-42-99-0 https://github.com/redhat-exd-rebuilds/renovate.git . \
     && git fetch --depth 1 origin ${RENOVATE_REVISION} \
     && git checkout ${RENOVATE_REVISION}
 
