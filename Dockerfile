@@ -80,7 +80,7 @@ ARG PIPX_VERSION=1.11.1
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=poetry
-ARG POETRY_VERSION=2.3.3
+ARG POETRY_VERSION=2.3.4
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=pdm
@@ -96,7 +96,7 @@ ARG HASHIN_VERSION=1.0.5
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=uv
-ARG UV_VERSION=0.11.5
+ARG UV_VERSION=0.11.6
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=hatch
