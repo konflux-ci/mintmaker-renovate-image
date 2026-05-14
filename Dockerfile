@@ -56,7 +56,7 @@ ARG YQ_VERSION=4.53.2
 # specified in Renovate's package.json
 ARG NODEJS_VERSION=24.11.0
 
-ARG PNPM_VERSION=10.23.0
+ARG PNPM_VERSION=10.33.4
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=npm depName=yarn
