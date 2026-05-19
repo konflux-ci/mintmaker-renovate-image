@@ -198,7 +198,7 @@ RUN curl -Lo /usr/bin/lein https://raw.githubusercontent.com/technomancy/leining
 
 # Add renovate user and switch to it
 RUN useradd -lms /bin/bash -u 1001 -g 0 renovate
-RUN mkdir -p /home/renovate/.cache /home/renovate/.local /home/renovate/.local/state/pdm /home/renovate/.rustup/tmp /home/renovate/.local/share/pnpm/.tools
+RUN mkdir -p /home/renovate/.cache /home/renovate/.local /home/renovate/.local/state/pdm /home/renovate/.rustup/tmp /home/renovate/.local/share/pnpm/.tools/pnpm
 RUN chown -R 1001:0 /home/renovate && chmod -R 2775 /home/renovate
 
 WORKDIR /home/renovate
