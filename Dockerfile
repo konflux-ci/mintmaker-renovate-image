@@ -129,6 +129,9 @@ ARG LEININGEN_VERSION=2.12.0
 # Support multiple Go versions
 ENV GOTOOLCHAIN=auto
 
+# Temporary fix for uv's cache dir permissions
+ENV UV_NO_CACHE=true
+
 # Using OpenSSL store allows for external modifications of the store. It is needed for the internal Red Hat cert.
 ENV NODE_OPTIONS="--use-openssl-ca --max-old-space-size=2816"
 
