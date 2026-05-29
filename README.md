@@ -16,8 +16,7 @@ As mentioned before, the `rpm` manager uses the [rpm-lockfile-prototype](https:/
 
 # Dockerfile design
 
-MintMaker's [Dockerfile](https://github.com/konflux-ci/mintmaker-renovate-image/blob/main/Dockerfile)
-is built from [ubi9-minimal](https://catalog.redhat.com/software/containers/ubi9-minimal/61832888c0d15aff4912fe0d).
+MintMaker's [Dockerfile](https://github.com/konflux-ci/mintmaker-renovate-image/blob/main/Dockerfile) is built from [ubi10-minimal](https://catalog.redhat.com/en/software/containers/ubi10-minimal/66f16af45db83414cddcfc99).
 
 The container image has to provide the following as a bare minimum:
 
