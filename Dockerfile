@@ -32,7 +32,7 @@ ARG RPM_LOCKFILE_PROTOTYPE_VERSION=0.22.1
 # https://github.com/konflux-ci/refresh-rpm-lockfiles/tags
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=github-tags depName=konflux-ci/refresh-rpm-lockfiles versioning=semver
-ARG REFRESH_RPM_LOCKFILES_VERSION=0.1.2
+ARG REFRESH_RPM_LOCKFILES_VERSION=0.1.3
 
 # Version for the pipeline-migration-tool from
 # https://github.com/konflux-ci/pipeline-migration-tool/tags
