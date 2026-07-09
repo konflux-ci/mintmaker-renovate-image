@@ -107,11 +107,11 @@ ARG HATCH_VERSION=1.17.0
 ARG PIP_TOOLS_VERSION=7.5.3
 
 # Do not remove the following line, renovate uses it to propose version updates
-# renovate: datasource=github-tags depName=helm/helm
+# renovate: datasource=github-tags depName=helm/helm versioning=semver
 ARG HELM_V3_VERSION=4.2.2
 
 # Do not remove the following line, renovate uses it to propose version updates
-# renovate: datasource=github-tags depName=gradle/gradle
+# renovate: datasource=github-tags depName=gradle/gradle versioning=semver
 ARG GRADLE_VERSION=9.6.1
 
 # Do not remove the following line, renovate uses it to propose version updates
@@ -119,11 +119,11 @@ ARG GRADLE_VERSION=9.6.1
 ARG CLOJURE_VERSION=1.12.4.1582
 
 # Do not remove the following line, renovate uses it to propose version updates
-# renovate: datasource=github-tags depName=sbt/sbt
+# renovate: datasource=github-tags depName=sbt/sbt versioning=semver
 ARG SBT_VERSION=1.12.13
 
 # Do not remove the following line, renovate uses it to propose version updates
-# renovate: datasource=github-tags depName=technomancy/leiningen
+# renovate: datasource=github-tags depName=technomancy/leiningen versioning=semver
 ARG LEININGEN_VERSION=2.13.0
 
 # Support multiple Go versions
