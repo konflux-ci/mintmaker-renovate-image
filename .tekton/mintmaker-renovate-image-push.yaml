@@ -121,6 +121,11 @@ spec:
       default: docker
       type: string
       description: The format for the resulting image's mediaType. Valid values are oci or docker.
+    - default: never
+      description: Mount /etc/rhsm/ca from the host machine into the build. Valid values
+        are 'always', 'auto', 'never' (default).
+      name: rhsm-mount-ca-certs
+      type: string
     - name: enable-package-registry-proxy
       default: 'true'
       description: Use the package registry proxy when prefetching dependencies
@@ -227,6 +232,8 @@ spec:
         value: $(params.build-args-file)
       - name: BUILDAH_FORMAT
         value: $(params.buildah-format)
+      - name: RHSM_MOUNT_CA_CERTS
+        value: $(params.rhsm-mount-ca-certs)
       runAfter:
       - prefetch-dependencies
       taskRef:
