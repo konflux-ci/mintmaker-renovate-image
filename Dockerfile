@@ -67,10 +67,6 @@ ARG YARN_VERSION=1.22.22
 ARG BUN_VERSION=1.3.14
 
 # Do not remove the following line, renovate uses it to propose version updates
-# renovate: datasource=npm depName=meteor
-ARG METEOR_VERSION=3.4.1
-
-# Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=rubygems depName=bundler
 ARG BUNDLER_VERSION=4.0.16
 
@@ -214,8 +210,6 @@ ENV PATH="/home/renovate/.local/bin:/home/renovate/node_modules/.bin:/home/renov
 
 # Install package managers
 RUN npm install pnpm@${PNPM_VERSION} yarn@${YARN_VERSION} bun@${BUN_VERSION} && npm cache clean --force
-RUN npx clear-npx-cache && npx meteor@${METEOR_VERSION} install
-ENV PATH="/home/renovate/.meteor:${PATH}"
 
 # Install bundler
 RUN gem install bundler -v ${BUNDLER_VERSION}
