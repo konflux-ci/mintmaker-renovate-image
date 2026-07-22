@@ -17,10 +17,10 @@ COPY LICENSE /licenses/LICENSE
 
 # The version number is from upstream Renovate, while the `-rpm` suffix
 # is to differentiate the rpm lockfile enabled fork
-ARG RENOVATE_VERSION=43.210.0-rpm
+ARG RENOVATE_VERSION=43.268.1-rpm
 
 # Specific git commit hash from the redhat-exd-rebuilds/renovate fork
-ARG RENOVATE_REVISION=fcf161f7bb1d90056bde67aa8eb7eecc8a66d053
+ARG RENOVATE_REVISION=eecc53c22df3ca68fcecc002b18162e712030baf
 
 # Version for the rpm-lockfile-prototype executable from
 # https://github.com/konflux-ci/rpm-lockfile-prototype/tags
@@ -56,7 +56,7 @@ ARG YQ_VERSION=4.53.3
 # specified in Renovate's package.json
 ARG NODEJS_VERSION=24.11.0
 
-ARG PNPM_VERSION=10.34.4
+ARG PNPM_VERSION=11.11.0
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=npm depName=yarn
@@ -258,15 +258,14 @@ WORKDIR /home/renovate/renovate
 
 # Clone Renovate from the fork and checkout the specific commit that includes custom
 # features for RPM lockfile support and Red Hat Container/RPM vulnerability alerts
-RUN git clone --depth=1 --branch renovate-43-210-0 https://github.com/redhat-exd-rebuilds/renovate.git . \
+RUN git clone --depth=1 --branch renovate-43-268-1 https://github.com/redhat-exd-rebuilds/renovate.git . \
     && git fetch --depth 1 origin ${RENOVATE_REVISION} \
     && git checkout ${RENOVATE_REVISION}
 
 # Replace package.json version for this build
 RUN sed -i "s/0.0.0-semantic-release/${RENOVATE_VERSION}/g" package.json
-
 # Install project dependencies, build and install Renovate
-RUN pnpm install && pnpm build && npm install --prefix /home/renovate . && pnpm store prune && npm cache clean --force
+RUN pnpm install && pnpm build && PNPM_HOME=/home/renovate/.local pnpm add -g . && pnpm store prune && npm cache clean --force
 
 # Run pipx install with the --system-site-packages so rpm-lockfile-prototype can use the system's python3-dnf package
 RUN pipx install --python python3.12 git+https://github.com/konflux-ci/rpm-lockfile-prototype.git@v${RPM_LOCKFILE_PROTOTYPE_VERSION} --system-site-packages && \
