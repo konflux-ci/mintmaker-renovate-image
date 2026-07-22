@@ -16,11 +16,11 @@ RELEASE_TAG=$(curl -s -L -H "Accept: application/json" https://github.com/astral
 DOWNLOAD_URL=$(curl -s -L -H "Accept: application/json" "https://api.github.com/repos/astral-sh/python-build-standalone/releases/tags/$RELEASE_TAG" | jq ".assets.[]|select(.name | startswith(\"cpython-$PYTHON_VERSION\"))|select(.name | endswith(\"$ARCH-$CONFIGURATION.tar.gz\"))" | jq -r .browser_download_url)
 
 # Download the archive and extract into ~/python{version}
-curl -s -L -o /tmp/python-$PYTHON_VERSION.tar.gz $DOWNLOAD_URL
-mkdir $HOME/python$PYTHON_VERSION
-tar xf /tmp/python-$PYTHON_VERSION.tar.gz -C $HOME/python$PYTHON_VERSION
-mv $HOME/python$PYTHON_VERSION/python/* $HOME/python$PYTHON_VERSION/
+curl -s -L -o "/tmp/python-${PYTHON_VERSION}.tar.gz" "${DOWNLOAD_URL}"
+mkdir "${HOME}/python${PYTHON_VERSION}"
+tar xf "/tmp/python-${PYTHON_VERSION}.tar.gz" -C "${HOME}/python${PYTHON_VERSION}"
+mv "${HOME}/python${PYTHON_VERSION}/python/"* "${HOME}/python${PYTHON_VERSION}/"
 
 # Clean up
-rm -r $HOME/python$PYTHON_VERSION/python
-rm /tmp/python-$PYTHON_VERSION.tar.gz
+rm -r "${HOME}/python${PYTHON_VERSION}/python"
+rm "/tmp/python-${PYTHON_VERSION}.tar.gz"

@@ -1,0 +1,50 @@
+name: Code quality
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint Dockerfile, Shell scripts, and Markdown
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Hadolint
+        uses: hadolint/hadolint-action@54c9adbab1582c2ef04b2016b760714a4bfde3cf # v3.1.0
+        with:
+          dockerfile: Dockerfile
+          config: .hadolint.yaml
+          failure-threshold: warning
+
+      - name: Shellcheck
+        run: shellcheck -x install-python.sh
+
+      - name: Markdownlint
+        uses: DavidAnson/markdownlint-cli2-action@05f32210e84442804257b2a6f20b273450ec8265 # v19
+        with:
+          config: .markdownlint.json
+          globs: |
+            README.md
+            AGENTS.md
+
+      - name: Actionlint
+        env:
+          # renovate: datasource=github-tags depName=rhysd/actionlint versioning=semver
+          ACTIONLINT_VERSION: 1.7.12
+        run: |
+          curl -fsSL "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz" \
+            | tar -xz actionlint
+          chmod +x actionlint
+          ./actionlint -shellcheck=shellcheck .github/workflows/*.yaml

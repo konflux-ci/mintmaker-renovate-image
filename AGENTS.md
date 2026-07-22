@@ -12,8 +12,11 @@ This repository hosts the custom Renovate container image for MintMaker. It is a
 
 - **Build**: `podman build --ulimit nofile=65535:65535 . -t custom-renovate`
 - **Run**: `podman run --rm <additional args> custom-renovate renovate`
+- **Lint**: `make lint`
 
 *Note: You can replace podman with docker in the commands above depending on the available local container engine.*
+
+Lint coverage and baselined rules are documented in [README.md (Development section)](README.md#development).
 
 ## Agent Directives
 

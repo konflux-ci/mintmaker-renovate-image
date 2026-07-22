@@ -1,0 +1,23 @@
+# Hadolint config for mintmaker-renovate-image.
+# Baselined rules are legacy Dockerfile patterns; see issue for cleanup backlog.
+# renovate: datasource=github-tags depName=hadolint/hadolint versioning=semver
+ignored:
+  # UBI base images use Red Hat catalog floating tags, not semver pins.
+  - DL3006
+  # microdnf install does not pin individual package versions.
+  - DL3041
+  # Intentional layer separation for cache granularity and faster rebuilds.
+  - DL3059
+  # Piped RUN steps (pyenv, rustup) do not set SHELL with pipefail.
+  - DL4006
+  # pip/pipx cache purge steps are intentional during image build.
+  - DL3042
+  # pip/pipx installs use ARG-pinned versions; hadolint cannot see substitutions.
+  - DL3013
+  # jsonnet-bundler is installed at @latest by design.
+  - DL3062
+  # Renovate build uses npm install --prefix with a local package.json.
+  - DL3016
+
+trustedRegistries:
+  - registry.access.redhat.com
