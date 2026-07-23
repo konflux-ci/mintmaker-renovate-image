@@ -26,7 +26,7 @@ ARG RENOVATE_REVISION=eecc53c22df3ca68fcecc002b18162e712030baf
 # https://github.com/konflux-ci/rpm-lockfile-prototype/tags
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=github-tags depName=konflux-ci/rpm-lockfile-prototype versioning=semver
-ARG RPM_LOCKFILE_PROTOTYPE_VERSION=0.26.0
+ARG RPM_LOCKFILE_PROTOTYPE_VERSION=0.27.0
 
 # Version for the refresh-rpm-lockfiles executable from
 # https://github.com/konflux-ci/refresh-rpm-lockfiles/tags
