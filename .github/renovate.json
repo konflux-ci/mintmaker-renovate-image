@@ -18,6 +18,10 @@
         "pypi"
       ],
       "groupName": "All Python Dependencies"
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "github actions"
     }
   ],
   "customManagers": [
