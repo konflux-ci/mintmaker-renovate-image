@@ -68,7 +68,7 @@ ARG BUN_VERSION=1.3.14
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=rubygems depName=bundler
-ARG BUNDLER_VERSION=4.0.16
+ARG BUNDLER_VERSION=4.0.17
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=pipx
