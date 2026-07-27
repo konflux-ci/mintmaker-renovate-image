@@ -3,6 +3,7 @@
   "extends": [
     "helpers:pinGitHubActionDigestsToSemver"
   ],
+  "dependencyDashboard": true,
   "tekton": {
     "enabled": true,
     "automergeType": "pr",
