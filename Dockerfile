@@ -274,4 +274,9 @@ RUN pipx install --python python3.12 git+https://github.com/konflux-ci/rpm-lockf
 RUN pipx install --python python3.12 git+https://github.com/konflux-ci/refresh-rpm-lockfiles.git@v${REFRESH_RPM_LOCKFILES_VERSION} && \
     rm -fr ~/.cache/pipx && pip3.12 cache purge
 
+# Install update_artifacts_lockfile for updating artifact checksums after version bumps
+RUN pip3.12 install --user 'ruamel.yaml' requests && pip3.12 cache purge
+COPY --chown=1001:0 update_artifacts_lockfile /home/renovate/.local/bin/update_artifacts_lockfile
+RUN chmod +x /home/renovate/.local/bin/update_artifacts_lockfile
+
 WORKDIR /workspace
