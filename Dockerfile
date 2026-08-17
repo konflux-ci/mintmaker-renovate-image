@@ -104,7 +104,7 @@ ARG PIP_TOOLS_VERSION=7.6.0
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=github-tags depName=helm/helm
-ARG HELM_V3_VERSION=4.2.3
+ARG HELM_V3_VERSION=4.2.4
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=github-tags depName=gradle/gradle
