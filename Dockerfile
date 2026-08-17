@@ -265,7 +265,11 @@ RUN git clone --depth=1 --branch renovate-43-268-1 https://github.com/redhat-exd
 # Replace package.json version for this build
 RUN sed -i "s/0.0.0-semantic-release/${RENOVATE_VERSION}/g" package.json
 # Install project dependencies, build and install Renovate
-RUN pnpm install && pnpm build && PNPM_HOME=/home/renovate/.local pnpm add -g . && pnpm store prune && npm cache clean --force
+RUN pnpm install && pnpm build \
+    && PNPM_HOME=/home/renovate/.local pnpm add -g . \
+    && pnpm prune --prod --ignore-scripts \
+    && pnpm store prune \
+    && npm cache clean --force
 
 # Run pipx install with the --system-site-packages so rpm-lockfile-prototype can use the system's python3-dnf package
 RUN pipx install --python python3.12 git+https://github.com/konflux-ci/rpm-lockfile-prototype.git@v${RPM_LOCKFILE_PROTOTYPE_VERSION} --system-site-packages && \
