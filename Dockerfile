@@ -72,7 +72,7 @@ ARG BUNDLER_VERSION=4.0.18
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=pipx
-ARG PIPX_VERSION=1.16.6
+ARG PIPX_VERSION=1.16.7
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=poetry
@@ -80,7 +80,7 @@ ARG POETRY_VERSION=2.4.1
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=pdm
-ARG PDM_VERSION=2.28.0
+ARG PDM_VERSION=2.28.1
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=pipenv
@@ -92,15 +92,15 @@ ARG HASHIN_VERSION=1.0.5
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=uv
-ARG UV_VERSION=0.12.3
+ARG UV_VERSION=0.12.4
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=hatch
-ARG HATCH_VERSION=1.17.1
+ARG HATCH_VERSION=1.18.0
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=pip-tools
-ARG PIP_TOOLS_VERSION=7.6.0
+ARG PIP_TOOLS_VERSION=7.6.1
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=github-tags depName=helm/helm
