@@ -108,7 +108,7 @@ ARG HELM_V3_VERSION=4.2.4
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=github-tags depName=gradle/gradle
-ARG GRADLE_VERSION=9.7.0
+ARG GRADLE_VERSION=9.7.1
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=github-tags depName=clojure/brew-install versioning=maven
