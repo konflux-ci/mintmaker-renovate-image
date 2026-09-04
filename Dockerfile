@@ -35,9 +35,9 @@ ARG RPM_LOCKFILE_PROTOTYPE_VERSION=0.30.1
 ARG REFRESH_RPM_LOCKFILES_VERSION=0.1.3
 
 # Version for the update-artifacts-lockfile executable from
-# https://github.com/coreos/update-artifacts-lockfile/tags
+# https://github.com/konflux-ci/update-artifacts-lockfile/tags
 # Do not remove the following line, renovate uses it to propose version updates
-# renovate: datasource=github-tags depName=coreos/update-artifacts-lockfile versioning=semver
+# renovate: datasource=github-tags depName=konflux-ci/update-artifacts-lockfile versioning=semver
 ARG UPDATE_ARTIFACTS_LOCKFILE_VERSION=0.1.0
 
 # Version for the pipeline-migration-tool from
@@ -284,7 +284,7 @@ RUN pipx install --python python3.12 git+https://github.com/konflux-ci/rpm-lockf
 RUN pipx install --python python3.12 git+https://github.com/konflux-ci/refresh-rpm-lockfiles.git@v${REFRESH_RPM_LOCKFILES_VERSION} && \
     rm -fr ~/.cache/pipx && pip3.12 cache purge
 
-RUN pipx install --python python3.12 git+https://github.com/coreos/update-artifacts-lockfile.git@v${UPDATE_ARTIFACTS_LOCKFILE_VERSION} && \
+RUN pipx install --python python3.12 git+https://github.com/konflux-ci/update-artifacts-lockfile.git@v${UPDATE_ARTIFACTS_LOCKFILE_VERSION} && \
     rm -fr ~/.cache/pipx && pip3.12 cache purge
 
 WORKDIR /workspace
