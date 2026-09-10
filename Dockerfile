@@ -38,7 +38,7 @@ ARG REFRESH_RPM_LOCKFILES_VERSION=0.1.3
 # https://github.com/konflux-ci/update-artifacts-lockfile/tags
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=github-tags depName=konflux-ci/update-artifacts-lockfile versioning=semver
-ARG UPDATE_ARTIFACTS_LOCKFILE_VERSION=0.1.0
+ARG UPDATE_ARTIFACTS_LOCKFILE_VERSION=0.2.0
 
 # Version for the pipeline-migration-tool from
 # https://github.com/konflux-ci/pipeline-migration-tool/tags
