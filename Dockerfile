@@ -44,7 +44,7 @@ ARG UPDATE_ARTIFACTS_LOCKFILE_VERSION=0.2.0
 # https://github.com/konflux-ci/pipeline-migration-tool/tags
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=github-tags depName=konflux-ci/pipeline-migration-tool versioning=semver
-ARG PIPELINE_MIGRATION_TOOL_VERSION=0.8.0
+ARG PIPELINE_MIGRATION_TOOL_VERSION=0.9.0
 
 # Version for the tekton cli from
 # https://github.com/tektoncd/cli/tags
