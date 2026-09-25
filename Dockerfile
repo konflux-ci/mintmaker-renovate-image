@@ -50,7 +50,7 @@ ARG PIPELINE_MIGRATION_TOOL_VERSION=0.9.0
 # https://github.com/tektoncd/cli/tags
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=github-tags depName=tektoncd/cli versioning=semver
-ARG TEKTON_CLI_VERSION=0.46.0
+ARG TEKTON_CLI_VERSION=0.46.1
 
 # Version for the yq from
 # https://github.com/mikefarah/yq/tags
