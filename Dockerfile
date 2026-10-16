@@ -58,6 +58,12 @@ ARG TEKTON_CLI_VERSION=0.46.1
 # renovate: datasource=github-tags depName=mikefarah/yq versioning=semver
 ARG YQ_VERSION=4.54.1
 
+# Version for umoci from
+# https://github.com/opencontainers/umoci/releases
+# Do not remove the following line, renovate uses it to propose version updates
+# renovate: datasource=github-releases depName=opencontainers/umoci versioning=semver
+ARG UMOCI_VERSION=0.6.0
+
 # NodeJS version used for Renovate, has to satisfy the version
 # specified in Renovate's package.json
 ARG NODEJS_VERSION=24.20.0
@@ -160,7 +166,8 @@ RUN microdnf update -y && \
         java-21-openjdk-devel \
         which \
         libpq-devel \
-        krb5-devel && \
+        krb5-devel \
+        crun && \
     microdnf clean all
 
 
@@ -172,6 +179,10 @@ RUN curl -L -o /tmp/helmv3.tar.gz https://get.helm.sh/helm-v${HELM_V3_VERSION}-l
 
 # Install yq
 RUN curl -L https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64 -o /usr/bin/yq && chmod +x /usr/bin/yq
+
+# Install umoci, used together with crun by pipeline-migration-tool to sandbox migration scripts
+RUN curl -Lo /usr/bin/umoci https://github.com/opencontainers/umoci/releases/download/v${UMOCI_VERSION}/umoci.linux.amd64 && \
+    chmod +x /usr/bin/umoci
 
 # Install nodejs
 RUN curl -o node-v${NODEJS_VERSION}-linux-x64.tar.xz https://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-x64.tar.xz
