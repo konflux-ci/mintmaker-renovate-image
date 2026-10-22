@@ -60,7 +60,7 @@ ARG YQ_VERSION=4.54.1
 
 # NodeJS version used for Renovate, has to satisfy the version
 # specified in Renovate's package.json
-ARG NODEJS_VERSION=24.20.0
+ARG NODEJS_VERSION=24.22.1
 
 ARG PNPM_VERSION=11.25.0
 
