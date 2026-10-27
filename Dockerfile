@@ -160,7 +160,8 @@ RUN microdnf update -y && \
         java-21-openjdk-devel \
         which \
         libpq-devel \
-        krb5-devel && \
+        krb5-devel \
+        crun && \
     microdnf clean all
 
 
