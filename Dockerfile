@@ -46,12 +46,6 @@ ARG UPDATE_ARTIFACTS_LOCKFILE_VERSION=0.2.0
 # renovate: datasource=github-tags depName=konflux-ci/pipeline-migration-tool versioning=semver
 ARG PIPELINE_MIGRATION_TOOL_VERSION=0.9.0
 
-# Version for the tekton cli from
-# https://github.com/tektoncd/cli/tags
-# Do not remove the following line, renovate uses it to propose version updates
-# renovate: datasource=github-tags depName=tektoncd/cli versioning=semver
-ARG TEKTON_CLI_VERSION=0.46.2
-
 # Version for the yq from
 # https://github.com/mikefarah/yq/tags
 # Do not remove the following line, renovate uses it to propose version updates
@@ -164,9 +158,6 @@ RUN microdnf update -y && \
         crun && \
     microdnf clean all
 
-
-# Install tekton
-RUN curl -L -o /tmp/tkn.tar.gz https://github.com/tektoncd/cli/releases/download/v${TEKTON_CLI_VERSION}/tkn_${TEKTON_CLI_VERSION}_Linux_x86_64.tar.gz && tar xvzf /tmp/tkn.tar.gz -C /usr/bin/ tkn && rm -f /tmp/tkn.tar.gz
 
 # Install helmv3
 RUN curl -L -o /tmp/helmv3.tar.gz https://get.helm.sh/helm-v${HELM_V3_VERSION}-linux-amd64.tar.gz && tar xvzf /tmp/helmv3.tar.gz -C /tmp; mv /tmp/linux-amd64/helm /usr/bin/helm && rm -f /tmp/helmv3.tar.gz && rm -rf /tmp/linux-amd64
