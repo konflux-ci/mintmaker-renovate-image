@@ -14,10 +14,10 @@ COPY LICENSE /licenses/LICENSE
 
 # The version number is from upstream Renovate, while the `-rpm` suffix
 # is to differentiate the rpm lockfile enabled fork
-ARG RENOVATE_VERSION=44.71.0-rpm
+ARG RENOVATE_VERSION=44.209.0-rpm
 
 # Specific git commit hash from the redhat-exd-rebuilds/renovate fork
-ARG RENOVATE_REVISION=6a2542ca879a3e0945f3090c6c3507de5345cbf7
+ARG RENOVATE_REVISION=ab7c62cf946246736f8befcbc233ab0381f7c205
 
 # Version for the rpm-lockfile-prototype executable from
 # https://github.com/konflux-ci/rpm-lockfile-prototype/tags
@@ -253,7 +253,7 @@ WORKDIR /home/renovate/renovate
 
 # Clone Renovate from the fork and checkout the specific commit that includes custom
 # features for RPM lockfile support and Red Hat Container/RPM vulnerability alerts
-RUN git clone --depth=1 --branch renovate-44-71-0 https://github.com/redhat-exd-rebuilds/renovate.git . \
+RUN git clone --depth=1 --branch renovate-44-209-0 https://github.com/redhat-exd-rebuilds/renovate.git . \
     && git fetch --depth 1 origin ${RENOVATE_REVISION} \
     && git checkout ${RENOVATE_REVISION}
 
