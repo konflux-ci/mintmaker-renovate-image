@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi10-minimal@sha256:c769ab6615ab32d02d5b3d65ff2eae6bc668ba823e77f46b78a4181f54d17a27
+FROM registry.access.redhat.com/ubi10-minimal@sha256:fb2f7f857cc60d88e3fad19da505083a682ca4569d7b55a61f64aaa43641f741
 LABEL description="Mintmaker - Renovate custom image" \
       summary="Mintmaker basic container image - a Renovate custom image" \
       maintainer="EXD Rebuilds Guild <exd-guild-rebuilds@redhat.com >" \
