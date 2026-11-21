@@ -117,7 +117,7 @@ ARG SBT_VERSION=1.13.1
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=github-tags depName=technomancy/leiningen
-ARG LEININGEN_VERSION=2.13.0
+ARG LEININGEN_VERSION=2.13.1
 
 # Support multiple Go versions
 ENV GOTOOLCHAIN=auto
