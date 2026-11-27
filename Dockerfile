@@ -64,10 +64,6 @@ ARG YARN_VERSION=1.22.22
 ARG BUN_VERSION=1.3.14
 
 # Do not remove the following line, renovate uses it to propose version updates
-# renovate: datasource=rubygems depName=bundler
-ARG BUNDLER_VERSION=4.1.0
-
-# Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=pypi depName=pipx
 ARG PIPX_VERSION=1.18.19
 
@@ -205,9 +201,6 @@ ENV PATH="/home/renovate/.local/bin:/home/renovate/node_modules/.bin:/home/renov
 
 # Install package managers
 RUN npm install pnpm@${PNPM_VERSION} yarn@${YARN_VERSION} bun@${BUN_VERSION} && npm cache clean --force
-
-# Install bundler
-RUN gem install bundler -v ${BUNDLER_VERSION}
 
 # Use virtualenv isolation to avoid dependency issues with other global packages
 RUN pip3.12 install --user pipx==${PIPX_VERSION} && pip3.12 cache purge
