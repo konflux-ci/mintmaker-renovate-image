@@ -105,7 +105,7 @@ ARG GRADLE_VERSION=9.9.2
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=github-tags depName=clojure/brew-install versioning=maven
-ARG CLOJURE_VERSION=1.12.6.1673
+ARG CLOJURE_VERSION=1.12.7.1681
 
 # Do not remove the following line, renovate uses it to propose version updates
 # renovate: datasource=github-tags depName=sbt/sbt
